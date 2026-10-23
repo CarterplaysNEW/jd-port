@@ -46,7 +46,7 @@ class Ch{
 async function initMenu(){
  M.fire=await atlas('menu/fire');M.logo=await atlas('menu/logo');
  M.ff=M.fire.get('fire');M.la=M.logo.get('appear');M.l0=M.la[M.la.length-1];
- M.items=['jams','members','settings'];M.sel=0;M.t=0;M.msg='';
+ M.items=['jams','members','settings','mods'];M.sel=0;M.t=0;M.msg='';
  M.music=snd('music/freakyMenu.ogg',1,.8);M.music.play().catch(()=>{});S='menu'}
 function menu(dt){
  M.t+=dt;const f=M.ff[Math.floor(M.t*24)%M.ff.length],s=H/f.fh;
@@ -57,11 +57,11 @@ function menu(dt){
  if(M.t>3){X.font='34px MArial, Arial';X.textAlign='center';
   M.items.forEach((n,i)=>{X.fillStyle=i==M.sel?'#ff0':'#fff';X.fillText(n,W/2,390+i*70)});
   X.font='20px MArial, Arial';X.fillStyle='#fff';X.fillText(M.msg,W/2,H-30)}
- if(M.t>3)for(const[cx,cy]of clicks){const i=Math.round((cy-378)/70);if(i>=0&&i<3&&Math.abs(cx-W/2)<170){M.sel=i;pressed.push('Enter')}}
+ if(M.t>3)for(const[cx,cy]of clicks){const i=Math.round((cy-378)/70);if(i>=0&&i<M.items.length&&Math.abs(cx-W/2)<170){M.sel=i;pressed.push('Enter')}}
  for(const k of pressed){
-  if(k=='ArrowUp'||k=='KeyW'){M.sel=(M.sel+2)%3;snd('sounds/click.ogg').play()}
-  if(k=='ArrowDown'||k=='KeyS'){M.sel=(M.sel+1)%3;snd('sounds/click.ogg').play()}
-  if(k=='Enter'&&M.t>3){if(M.sel==0){snd('sounds/bass.ogg').play();M.music.pause();openElev()}else if(M.sel==1){snd('sounds/click.ogg').play();openCred()}else if(M.sel==2){snd('sounds/click.ogg').play();openSet()}else M.msg='Coming soon!'}}}
+  const nI=M.items.length;if(k=='ArrowUp'||k=='KeyW'){M.sel=(M.sel+nI-1)%nI;snd('sounds/click.ogg').play()}
+  if(k=='ArrowDown'||k=='KeyS'){M.sel=(M.sel+1)%nI;snd('sounds/click.ogg').play()}
+  if((k=='Enter'||k=='Space')&&M.t>3){if(M.sel==0){snd('sounds/bass.ogg').play();M.music.pause();openElev()}else if(M.sel==1){snd('sounds/click.ogg').play();openCred()}else if(M.sel==2){snd('sounds/click.ogg').play();openSet()}else if(M.sel==3){snd('sounds/click.ogg').play();openMods()}}}}
 
 /* ---------- SONG ---------- */
 const DIR=['LEFT','DOWN','UP','RIGHT'],COL=['purple','blue','green','red'],STS={johndoe:{cs:.9,bf:[708,150],dad:[200,100],cb:[-130,-20],cd:[200,0],zoom:.9},devilish:{bf:[708,165],dad:[200,100],cb:[0,0],cd:[-25,25],zoom:1},'1':{bf:[708,150],dad:[200,150],cb:[-75,175],cd:[125,150],zoom:.72,cs:1},strawberry:{bf:[708,150],dad:[710,150],cb:[100,100],cd:[-300,200],zoom:1.5,cs:1,snap:1,nocz:1,xo:200},'obby-for-succ':{bf:[708,165],dad:[200,100],cb:[0,0],cd:[-25,25],zoom:1,cs:1},rockhard:{bf:[708,150],dad:[200,150],cb:[-75,175],cd:[125,150],zoom:.9,cs:1},'party-time':{bf:[708,165],dad:[200,100],cb:[0,0],cd:[-25,25],zoom:1,cs:1},iloveyou:{bf:[708,165],dad:[200,100],cb:[0,0],cd:[-25,25],zoom:1,cs:1},bloxwatch:{bf:[908,250],dad:[100,100],gf:[330,100],cb:[-100,50],cd:[0,75],zoom:.95,cs:.85},joy:{bf:[800,150],dad:[300,100],cb:[-130,-20],cd:[20,0],zoom:.9,cs:1.2},noli:{bf:[1100,200],dad:[325,460],gf:[2000,525],cb:[65,-50],cd:[0,0],zoom:.9,cs:.8},bloxpin:{bf:[708,165],dad:[300,55],cb:[-100,18],cd:[265,-80],zoom:.8,cs:.8},'bloody-mary':{bf:[1100,200],dad:[1300,200],cb:[65,0],cd:[0,0],zoom:1.3,cs:.8}};STS['bloxpin-scary']=STS.bloxpin;let ST=STS.johndoe;const NOSTAGE=i=>i=='obby-for-succ'||i=='party-time'||i=='iloveyou';const PP=n=>['rbf','rs','max','black','mirrorman','bfmay','bfhead','rbfdark','rbfscared','rbf-bighead','rbf-smallhead'].includes(n)?ST.bf:n=='sorry'||n=='guy'?ST.gf:ST.dad;const DADS={joy:'rust',noli:'noli',bloxpin:'teddy_bloxpin','bloxpin-scary':'evil_teddy_bloxpin','bloody-mary':'black1'},BFS={'bloxpin-scary':'rbfscared','bloody-mary':'bfmay'};
@@ -424,7 +424,7 @@ function secretKeys(G,dt){const up=(held.Digit4||held.Numpad4)&&!('Digit4' in KM
 
 /* ---------- SETTINGS ---------- */
 const PRE={WASD:['KeyA','KeyS','KeyW','KeyD'],DFJK:['KeyD','KeyF','KeyJ','KeyK']};
-let cfg={bind:PRE.WASD.slice(),alt:['ArrowLeft','ArrowDown','ArrowUp','ArrowRight'],touch:0,pix:1,proof:0,hid:0,cz:1,cs:1,down:0,cm:1,ghost:1,ap:1,gh:1};
+let cfg={bind:PRE.WASD.slice(),alt:['ArrowLeft','ArrowDown','ArrowUp','ArrowRight'],touch:0,pix:1,proof:0,hid:0,cz:1,cs:1,down:0,cm:1,ghost:1,ap:1,gh:1,mod:'hjd'};
 try{Object.assign(cfg,JSON.parse(localStorage.jdset||'{}'))}catch(e){}
 const lab=c=>({ArrowLeft:'←',ArrowDown:'↓',ArrowUp:'↑',ArrowRight:'→',Space:'space'}[c]||c.replace(/^(Key|Digit)/,''));
 function buildKM(){KM={};cfg.alt.forEach((c,l)=>{if(c)KM[c]=l});cfg.bind.forEach((c,l)=>{if(c)KM[c]=l})}
@@ -455,10 +455,10 @@ function sett(dt){
   else if(k=='Digit4'&&sc=='main'){reroll();snd('sounds/click.ogg').play()}
   else if(k=='Enter'||k=='Space')sact(SE.sel);
   else if(sc=='buttons'&&SE.sel<4&&(k=='ArrowLeft'||k=='ArrowRight'||k=='KeyA'||k=='KeyD'))SE.slot=1-SE.slot;
-  if(S!='set')return}
- for(const[cx,cy]of clicks){if(SE.wait||S!='set')break;if(cx<120&&cy<50){sback();continue}
+  if(S!='set')return;if(SE.scr!=sc)break}
+ for(const[cx,cy]of clicks){if(SE.wait||S!='set'||SE.scr!=sc)break;if(cx<120&&cy<50){sback();continue}
   for(let i=0;i<n;i++)if(Math.abs(cy-srow(sc,i,n))<(sc=='buttons'?36:30)){if(sc=='buttons'&&i<4)SE.slot=cx>625?1:0;SE.sel=i;sact(i);break}}
- if(S!='set')return;
+ if(S!='set'||SE.scr!=sc)return;
  X.fillStyle='#000';X.fillRect(0,0,W,H);X.textBaseline='middle';X.textAlign='left';
  if(sc=='main'){X.font='40px MArial, Arial';SE.words.forEach((w,i)=>{X.fillStyle=i==SE.sel?'#ff0':'#fff';X.fillText(w,SE.off,srow(sc,i,3))})}
  else if(sc=='buttons'){X.font='24px MArial, Arial';X.fillStyle='#fff';X.textAlign='center';X.fillText('NOTES',W/2,170);X.textAlign='left';
@@ -471,10 +471,28 @@ function sett(dt){
    const on=!!cfg[key],bx=SE.off+w,by=y-23+9;if(SE.kI){if(on)X.drawImage(SE.kI,0,0,29,27,bx,by,29,27);else X.drawImage(SE.kI,29,0,24,26,bx,by,24,26)}else{X.fillStyle='#fff';X.fillText(on?'[x]':'[ ]',bx,y)}})}
  X.textBaseline='alphabetic';X.textAlign='left';if(touchOn()){X.font='16px MArial, Arial';X.fillStyle='#aaa';X.fillText('‹ back',16,28)}X.textAlign='center'}
 
+/* ---------- MODS (pick which mod the port runs) ---------- */
+const MODS=[{n:'Hello John Doe',id:'hjd',ok:1},{n:'Hello Again John Doe',id:'hajd',ok:0}];
+const MO={sel:0,msg:'',mt:0};
+function openMods(){MO.sel=Math.max(0,MODS.findIndex(m=>m.id==cfg.mod));MO.msg='';MO.mt=0;S='mods'}
+function mods(dt){const n=MODS.length,ry=i=>H/2-35*(n-1)+70*i,mv=d=>{MO.sel=(MO.sel+n+d)%n;MO.msg='';snd('sounds/click.ogg').play()};
+ const choose=()=>{const m=MODS[MO.sel];if(!m.ok){MO.msg='Coming soon!';MO.mt=2;snd('sounds/lockSound.ogg').play();return}cfg.mod=m.id;saveCfg();snd('sounds/click.ogg').play();S='menu'};
+ for(const k of pressed){if(k=='ArrowUp'||k=='KeyW')mv(-1);else if(k=='ArrowDown'||k=='KeyS')mv(1);else if(k=='Enter'||k=='Space')choose();else if(k=='Escape'||k=='Backspace'){snd('sounds/click.ogg').play();S='menu'}if(S!='mods')return}
+ for(const[cx,cy]of clicks){if(touchOn()&&cx<120&&cy<50){S='menu';return}for(let i=0;i<n;i++)if(Math.abs(cy-ry(i))<30&&Math.abs(cx-W/2)<260){if(MO.sel==i)choose();else{MO.sel=i;MO.msg='';snd('sounds/click.ogg').play()}if(S!='mods')return}}
+ if(MO.mt>0)MO.mt-=dt;
+ X.fillStyle='#000';X.fillRect(0,0,W,H);X.textAlign='center';X.textBaseline='middle';
+ X.font='40px MArial, Arial';X.fillStyle='#fff';X.fillText('mods',W/2,110);
+ MODS.forEach((m,i)=>{X.font='34px MArial, Arial';X.fillStyle=i==MO.sel?'#ff0':'#fff';X.globalAlpha=m.ok?1:.55;X.fillText(m.n+(m.id==cfg.mod?'  (on)':''),W/2,ry(i))});X.globalAlpha=1;
+ X.font='20px MArial, Arial';X.fillStyle='#fff';if(MO.mt>0){X.globalAlpha=Math.min(1,MO.mt);X.fillText(MO.msg,W/2,ry(n-1)+80);X.globalAlpha=1}
+ X.globalAlpha=.6;X.fillText('up/down to pick, enter to choose, esc to go back',W/2,H-30);X.globalAlpha=1;X.textBaseline='alphabetic';
+ if(touchOn()){X.font='16px MArial, Arial';X.textAlign='left';X.fillStyle='#aaa';X.fillText('‹ back',16,28);X.textAlign='center'}}
+
 /* ---------- LOOP ---------- */
 addEventListener('keydown',e=>{if(e.repeat)return;if(e.code in KM||e.code=='Enter'||e.code=='Escape'||e.code.startsWith('Arrow'))e.preventDefault();
  pressed.push(e.code);held[e.code]=1;keys.sh=e.shiftKey;if(e.code in KM)keys['L'+KM[e.code]]=1;
- if(S=='start'&&e.code=='Enter')boot()});
+ if(S=='start'&&e.code=='Enter')boot();else if(S=='err'&&(e.code=='Enter'||e.code=='Escape'||e.code=='Space'))errBack()});
+addEventListener('unhandledrejection',e=>{const nm=e.reason&&e.reason.name;if(S=='load'&&!['NotAllowedError','AbortError','NotSupportedError'].includes(nm)){err=(e.reason&&e.reason.message)||String(e.reason);S='err';console.error(e.reason)}});
+function errBack(){err='';try{if(g){g.inst&&g.inst.pause();g.voc&&g.voc.pause();(g.vids||[]).forEach(v=>v.pause());stopSfx()}}catch(x){}g=null;T=[];if(M.music){S='menu';M.music.play().catch(()=>{})}else boot()}
 addEventListener('keyup',e=>{held[e.code]=0;if(e.code in KM)keys['L'+KM[e.code]]=0});
 const clicks=[],tap=[],tl={};
 const mpos=e=>{if(e.pointerType!='mouse')return;const r=cv.getBoundingClientRect();MS.on=1;MS.x=(e.clientX-r.left)*cv.width/r.width;MS.y=(e.clientY-r.top)*cv.height/r.height};
@@ -484,7 +502,7 @@ let fcDrag=null;cv.addEventListener('pointerdown',e=>{if(S=='play'&&g&&g.fc){fcD
 cv.addEventListener('pointermove',e=>{if(fcDrag&&g&&g.fc){const sc=cv.width/cv.clientWidth;g.fx-=(e.clientX-fcDrag[0])*sc/g.fz;g.fy-=(e.clientY-fcDrag[1])*sc/g.fz;fcDrag=[e.clientX,e.clientY]}});
 cv.addEventListener('pointerup',()=>{fcDrag=null});
 cv.addEventListener('wheel',e=>{if(S=='play'&&g&&g.fc){e.preventDefault();g.fz=Math.min(4,Math.max(.15,g.fz*Math.exp(-e.deltaY*.001)))}},{passive:false});
-cv.addEventListener('pointerdown',e=>{if(S=='start')boot();const r=cv.getBoundingClientRect(),p=[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];clicks.push(p);
+cv.addEventListener('pointerdown',e=>{if(S=='start')boot();else if(S=='err')errBack();const r=cv.getBoundingClientRect(),p=[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];clicks.push(p);
  if(touchOn()&&p[0]<110&&p[1]<40&&S=='elev')pressed.push('Escape');
  if(S=='play'&&g&&!g.vid&&touchOn()&&p[1]>40){const l=Math.min(3,Math.max(0,Math.floor(p[0]/(W/4))));tl[e.pointerId]=l;keys['L'+l]=1;tap.push(l)}});
 const up=e=>{if(e.pointerId in tl){keys['L'+tl[e.pointerId]]=0;delete tl[e.pointerId]}};['pointerup','pointercancel','pointerleave'].forEach(n=>cv.addEventListener(n,up));
@@ -493,11 +511,11 @@ addEventListener('unhandledrejection',e=>{err=(e.reason&&e.reason.message)||Stri
 let last=performance.now();
 (function loop(now){
  const dt=Math.min(.05,(now-last)/1000);last=now;
- try{if(S=='menu')menu(dt);else if(S=='elev')elev(dt);else if(S=='set')sett(dt);else if(S=='cred')cred(dt);else if(S=='play')play(dt);else{
+ try{if(S=='menu')menu(dt);else if(S=='elev')elev(dt);else if(S=='set')sett(dt);else if(S=='mods')mods(dt);else if(S=='cred')cred(dt);else if(S=='play')play(dt);else{
   X.fillStyle='#000';X.fillRect(0,0,W,H);X.fillStyle='#fff';X.textAlign='center';X.font='32px MArial, Arial';
-  X.fillText(S=='start'?'Click or press Enter to start':S=='err'?'Error: '+err:(LP.msg||'Loading...'),W/2,H/2);if(S=='load'&&LP.t){const bw=360,pr=Math.min(1,LP.n/LP.t);X.strokeStyle='#fff';X.lineWidth=2;X.strokeRect(W/2-bw/2,H/2+30,bw,18);X.fillRect(W/2-bw/2+3,H/2+33,(bw-6)*pr,12)}}}
+  X.fillText(S=='start'?'Click or press Enter to start':S=='err'?'Error: '+err:(LP.msg||'Loading...'),W/2,H/2);if(S=='err'){X.font='20px MArial, Arial';X.fillText('press enter or click to go back',W/2,H/2+44)}if(S=='load'&&LP.t){const bw=360,pr=Math.min(1,LP.n/LP.t);X.strokeStyle='#fff';X.lineWidth=2;X.strokeRect(W/2-bw/2,H/2+30,bw,18);X.fillRect(W/2-bw/2+3,H/2+33,(bw-6)*pr,12)}}}
  catch(e){err=e.message;S='err';console.error(e)}
- {const sh=MS.on&&CUR.width&&(S=='menu'||S=='elev'||S=='set'||S=='cred'||(S=='play'&&g&&(g.paused||g.dead||g.fc||(g.ily&&g.hold&&g.ily.ph==1))));if(sh){X.globalAlpha=1;X.drawImage(CUR,MS.x-5,MS.y-5)}if(sh!==MS.show){MS.show=sh;cv.style.cursor=sh?'none':''}}
+ {const sh=MS.on&&CUR.width&&(S=='menu'||S=='elev'||S=='set'||S=='cred'||S=='mods'||(S=='play'&&g&&(g.paused||g.dead||g.fc||(g.ily&&g.hold&&g.ily.ph==1))));if(sh){X.globalAlpha=1;X.drawImage(CUR,MS.x-5,MS.y-5)}if(sh!==MS.show){MS.show=sh;cv.style.cursor=sh?'none':''}}
  pressed.length=0;clicks.length=0;tap.length=0;requestAnimationFrame(loop)})(last);
 
 /* ---------- CODE WALL (matrix bg from the stage script) ---------- */
