@@ -54,7 +54,7 @@ async function initMenu(){
  M.fire=await atlas('menu/fire');M.logo=await atlas('menu/logo');
  M.ff=M.fire.get('fire');M.la=M.logo.get('appear');M.l0=M.la[M.la.length-1];
  M.items=['jams','members','settings','mods'];M.sel=0;M.t=0;M.msg='';
- M.music=snd('music/freakyMenu.ogg',1,.8);M.music.play().catch(()=>{});S='menu'}
+ M.music=snd('music/freakyMenu.ogg',1,.8);if(cfg.mod=='hajd'){S='menu';return hajdStart().catch(e=>{console.error(e);cfg.mod='hjd';S='menu';M.music.play().catch(()=>{})})}M.music.play().catch(()=>{});S='menu'}
 function menu(dt){
  M.t+=dt;const f=M.ff[Math.floor(M.t*24)%M.ff.length],s=H/f.fh;
  X.fillStyle='#000';X.fillRect(0,0,W,H);
@@ -83,7 +83,7 @@ async function startSong(id){stopSfx();
  const bx=id=='bloxwatch'?{eyesA:await atlas('images/s/eyes'),bubA:await atlas('images/s/bubble'),spotImg:await L('images/s/spotlight.png')}:id=='rockhard'?{cbI:await L('images/cb.png'),gateI:await L('images/gate.png')}:id=='joy'?{jo:await LL({forest:L('images/forest.png'),ice:L('images/ice.png'),white:L('images/floorshiny.png'),computer:L('images/computer.png'),green:L('images/green.png')})}:id=='bloody-mary'?{bmI:await LL({scary:L('images/bloody/scaryworld.png'),bath:L('images/bloody/bathroom.png'),norm:L('images/bloody/normalbg.png'),evil:L('images/bloody/evilbg.png'),vig:L('images/bloody/vignette.png'),rock:L('images/bloody/rockscroll.png'),pt2:L('images/bloody/pt2.png')}),bmA:await LL({fg:atlas('images/bloody/fg'),ok:atlas('images/bloody/ok'),thing:atlas('images/bloody/thing'),bod:atlas('images/bloody/bfbod')})}:id=='noli'?{nI:await LL({outside:L('images/outside.png'),hall:L('images/hall.png'),snow:L('images/snowworld.png'),bee:L('images/bee.png')})}:id.startsWith('bloxpin')?{tb:{evil:id=='bloxpin-scary',bg:await L('images/'+(id=='bloxpin-scary'?'evilteddybg':'teddybg')+'.png'),...(id=='bloxpin'?{popA:await atlas('images/textbox'),fireA:await atlas('images/fire'),beamA:await atlas('images/beam'),expA:await atlas('images/explosion')}:{})}}:{};
  const ib=id=='iloveyou'?{txtA:await atlas('images/intro/txts'),balls:await Promise.all(['green','red','blue','yellow'].map(c=>L('images/balls/ball-'+c+'.png')))}:id=='party-time'?{errImg:await L('images/error.png')}:{};
  const song=ch.song,secs=song.notes,starts=[],notes=[];let t=0,bpm=song.bpm,bb=0;
- secs.forEach(s=>{if(s.changeBPM&&s.bpm)bpm=s.bpm;starts.push({t,bpm,must:!!s.mustHitSection,alt:!!s.altAnim&&!s.gfSection,b:bb});bb+=(s.sectionBeats||4);
+ secs.forEach(s=>{if(s.changeBPM&&s.bpm)bpm=s.bpm;starts.push({t,bpm,must:!!s.mustHitSection,alt:!!s.altAnim&&!s.gfSection,b:bb,camSL:s.camSL});bb+=(s.sectionBeats||4);
   for(const n of s.sectionNotes)notes.push({t:n[0],l:n[1]%4,len:n[2]>0?n[2]:0,sk:1,sN:n[2]>0?Math.floor(n[2]/(15000/bpm)):0,sm:15000/bpm,alt:n[3]==='Alt Animation',na:n[3]==='No Animation',ty:n[4]||n[3]||'',pl:(n[1]<4)===!!s.mustHitSection,hit:0,miss:0,done:0});
   t+=(s.sectionBeats||4)*60000/bpm});
  notes.sort((a,b)=>a.t-b.t);
@@ -91,7 +91,7 @@ async function startSong(id){stopSfx();
  const au=id=='bloxpin-scary'?'bloxpin':id,inst=snd(CN?CN.inst:'songs/'+au+'/inst.ogg'),voc=CN?cneVocals(CN):snd('songs/'+au+'/voices.ogg');voc.play=(p=>function(){return p.call(this).catch(()=>{})})(voc.play);
  g={song,starts,notes,nf,na:notes_at,sky,floor,home,cd,dad:DADS[id]?cd[DADS[id]]:cd.jd||cd.guest||cd['1x1']||cd.bob||cd.cheek||cd.bwdark||cd.rbf,bf:BFS[id]?cd[BFS[id]]:cd.black||cd.rbf||cd.rs||cd.max,inst,voc,evs:mergeEv(song.events,ev&&ev.song&&ev.song.events),ei:0,si:0,pos:-1500,go:0,
   spd:song.speed,zoom:ST.zoom,cx:640,cy:360,home_a:0,floor_a:1,glitch:0,force:null,hp:1,score:0,miss:0,combo:0,pop:null,pp:{},ct:[9,9,9,9],tm:0,dUntil:0};Object.assign(g,{xr:1,hudA:id=='johndoe'?0:1,camA:id=='johndoe'?0:1,camV:1,wfl:0,hgm:1,bfHud:0,spl,sp:[],ba:{n:'dad',t:0},mt:20,mshow:0,hs:[],hidden:0,cz:0,timers:[],flash:0,hg:0,cover:id=='strawberry'?1:0,i0:0,pa,paused:0,dead:0,psel:0,dz:ST.zoom,lsi:-1,lb:-1,recam:1,id,jd,logo,fire:BG[3],crowdY:1200,bt:1200,fire_a:0,fa:0,ha:(id=='johndoe'||id=='devilish')?0:1,wh:id=='devilish'?1:0,tint:id=='devilish'?1:0,lg:[],pos:jd?-1500:-600,vids:jd||CN?[]:(id=='1'?['1intro','1outro','1train','1pizza','1oof','1burger']:id=='strawberry'?['strawberryintro']:id=='obby-for-succ'?['obbyvideo']:id=='party-time'?['partytime']:id=='iloveyou'?['ilygreen','ilyred','ilyblue','ilyyellow']:id=='bloxwatch'?['bloxwatchintro']:id=='joy'?['joyintro','poop']:id=='bloody-mary'?['bloodyintro','bloodyawake','bloodywalk']:['intro','monster']).map(n=>{const v=document.createElement('video');v.src=A+'videos/'+n+'.mp4';v.muted=true;v.playsInline=true;v.preload='auto';return v})});g.hs=id=='1'?g.vids.slice(2):id=='obby-for-succ'?g.vids.slice():[];if(id=='strawberry'){g.oct=[9,9,9,9];const v0=g.vids[0];v0.onended=v0.onerror=()=>{g.cover=0}}
- if(CN){Object.assign(g,{dad:CN.dad,bf:CN.bf,gf:CN.gf,cne:CN.stage,cn:CN,cnLogo:logo,sfx:[],zoom:CN.ST.zoom,dz:CN.ST.zoom,pos:-60000/song.bpm,czi:4,czs:1,cze:'BEAT',czo:0,clb:null,camSpd:1,cang:0,snappy:0,cflash:null,csT:{},logoS:[],sndQ:CN.sndQ.slice(),swQ:CN.swQ.slice()});XO=554-(W-434)/2;cneBuildScene(g);await cneScriptsInit(g)}
+ if(CN){Object.assign(g,{dad:CN.dad,bf:CN.bf,gf:CN.gf,cne:CN.stage,cn:CN,cnLogo:logo,sfx:[],zoom:CN.ST.zoom,dz:CN.ST.zoom,pos:-60000/song.bpm,czi:4,czs:1,cze:'BEAT',czo:0,clb:null,camSpd:1,cang:0,snappy:0,cflash:null,csT:{},logoS:[],sndQ:CN.sndQ.slice(),swQ:CN.swQ.slice()});XO=CNE.plX-(W-434)/2;cneBuildScene(g);await cneScriptsInit(g);await Promise.all([hPauseInit(g),hDeathInit(g)])}
  if(id=='iloveyou')Object.assign(g,ib,{hold:1,cover:1,ily:{ph:0,t:0,init:0,txt:'pick',music:null}});
  if(id=='party-time')Object.assign(g,ib,{cover:1,end2:0});
  if(id=='rockhard')Object.assign(g,bx,{hudw:0,rip:0,ript:0,ripr:0,cbOn:1,gateOn:0,run:{on:0,init:0,vx:0,base:0,w:0},sev:[[64881,()=>{g.bf.vis=false}],[78095,()=>{g.cbOn=0;g.gateOn=1}]]});
@@ -113,7 +113,7 @@ async function startSong(id){stopSfx();
 function vplay(v){v.__e=0;v.__c=0;try{v.currentTime=0}catch(e){}v.play().catch(()=>{})}
 function vsync(G,dt){for(const v of G.vids){if(v.paused||v.ended||v.__e==null)continue;v.__e+=dt*(G.xr||1);if(G.xr&&v.playbackRate!==G.xr)v.playbackRate=Math.min(4,Math.max(.25,G.xr));v.__c-=dt;if(v.__c<=0&&v.videoWidth&&Math.abs(v.currentTime-v.__e)>.25&&v.__e<(v.duration||1e9)-.3){v.__c=.5;try{v.currentTime=v.__e}catch(e){}}}}
 function stopSfx(){if(g&&g.sfx)g.sfx.forEach(a=>{try{a.pause()}catch(e){}})}
-function endSong(fin){if(S!='play')return;stopSfx();setRes(960);if(fin&&g.id=='party-time'&&!g.skipHook){g.end2=1;g.endT=0;g.cover=1;g.vids.forEach(v=>v.pause());return}if(g.ily&&g.ily.music)g.ily.music.pause();g.inst.pause();g.voc.pause();if(g.mus)g.mus.pause();if(g.vid)g.vid.pause();g.vids.forEach(v=>v.pause());T=[];try{const k='jdb_'+g.id;if(g.score>(+localStorage[k]||0))localStorage[k]=g.score;if(fin)localStorage['jdc_'+g.id]=Math.max(+localStorage['jdc_'+g.id]||0,g.miss?1:2)}catch(e){}openElev()}
+function endSong(fin){if(S!='play')return;stopSfx();if(!g.cne)setRes(960);if(fin&&g.id=='party-time'&&!g.skipHook){g.end2=1;g.endT=0;g.cover=1;g.vids.forEach(v=>v.pause());return}if(g.ily&&g.ily.music)g.ily.music.pause();g.inst.pause();g.voc.pause();if(g.mus)g.mus.pause();if(g.vid)g.vid.pause();g.vids.forEach(v=>v.pause());T=[];try{const k='jdb_'+g.id;if(g.score>(+localStorage[k]||0))localStorage[k]=g.score;if(fin)localStorage['jdc_'+g.id]=Math.max(+localStorage['jdc_'+g.id]||0,g.miss?1:2)}catch(e){}if(g.cne){if(g.hdS&&g.hdS.mus)g.hdS.mus.pause();hajdSongEnd(g,fin);return}openElev()}
 function mergeEv(a,b){const seen=new Set(),out=[];for(const src of[a||[],b||[]])for(const e of src)for(const x of e[1]){const k=e[0]+'|'+x.join('|');if(!seen.has(k)){seen.add(k);out.push([e[0],[x]])}}return out.sort((p,q)=>p[0]-q[0])}
 function fire(n,a,b,P){
  if(g.cne&&cneEv(g,n,P||[a,b]))return;
@@ -175,12 +175,12 @@ function rate(d){d=Math.abs(d);return d<=45?['SICK!',350,1]:d<=90?['Good',200,.9
 function hitKey(l){
  let b=null;for(const n of g.notes){if(n.t-g.pos>166)break;if(n.pl&&!n.hit&&!n.miss&&n.l==l&&Math.abs(n.t-g.pos)<=166){b=n;break}}
  if(g.cne&&b)g.cz=1;if(!b){if(!cfg.ghost&&g.go&&!g.paused){g.hp=Math.max(0,g.hp-.0475);g.combo=0;g.miss++;g.score-=10;sing(g.bf,l,0,1);g.voc.volume=0;g.vt=1.5;g.pop={t:'Miss',a:0}}return}b.hit=1;g.ct[l]=0;{const e={player:true,ty:b.ty,dir:l,sus:false,cancel:false};if(g.sc&&g.sc.onNoteHit)g.sc.onNoteHit(e);if(!b.na&&!e.cancel)sing(g.bf,l)}g.voc.volume=1;
- const r=rate(b.t-g.pos);if(r[0]=='SICK!')g.sp.push({l,t:0});g.score+=r[1];g.combo++;g.hp=Math.min(2,g.hp+.023*r[2]*1.3*(g.hgm||1));g.pop={t:r[0]+'  x'+g.combo,a:0}}
+ const r=rate(b.t-g.pos);g.accS=(g.accS||0)+(r[0]=='SICK!'?1:r[2]*.8);g.accN=(g.accN||0)+1;if(r[0]=='SICK!')g.sp.push({l,t:0});g.score+=r[1];g.combo++;g.hp=Math.min(2,g.hp+.023*r[2]*1.3*(g.hgm||1));g.pop={t:r[0]+'  x'+g.combo,a:0}}
 function play(dt){
  const G=g,stepSec=15/G.starts[G.si].bpm;
- if(G.paused){pauseMenu(dt);return}
+ if(G.paused){if(G.cne&&G.hp_)hPause(G,dt);else pauseMenu(dt);return}
  if(G.rs){dt=0;G.rsT+=1/60;if(G.inst.paused)G.inst.play().catch(()=>{});if(G.voc.paused)G.voc.play().catch(()=>{});const mv=G.inst.currentTime>G.rsC+.04&&G.inst.readyState>=3;if(mv||G.rsT>3){G.rs=0;G.vwas.forEach(v=>v.play().catch(()=>{}));if(mv)G.pos=G.inst.currentTime*1000}}
- if(G.dead){death(dt);return}
+ if(G.dead){if(G.hdS)hDeath(G,dt);else death(dt);return}
  if(G.hold){ilyFrame(dt);return}
  if(G.end2){partyEnd(dt);return}
  if(G.vid){tick(dt);const v=G.vid;X.fillStyle='#000';X.fillRect(0,0,W,H);
@@ -189,7 +189,7 @@ function play(dt){
   if((pressed.includes('Enter')||clicks.length)&&!G.skip){G.skip=1;tw(G,'va',0,.6);setTimeout(()=>{v.pause();G.vid=null},650)}
   return}
  if(!G.go){G.pos+=dt*1000;if(G.pos>=0&&G.inst.readyState<3&&(G.bw=(G.bw||0)+dt)<20){G.pos=-1;G.buf=1}else if(G.pos>=0){G.buf=0;G.go=1;if(G.sc&&G.sc.onSongStart)G.sc.onSongStart();G.inst.play();G.voc.play();if(G.id=='1')vplay(G.vids[0]);if(G.id=='noli'){tw(G,'camA',1,1,'quadIn');tw(G,'hudA',1,1,'quadIn')}if(G.jd){tw(G,'zoom',G.zoom-.1,1.67,'quadInOut');G.ha=1;tw(G,'camA',1,1.42,'sineOut');G.wfl=1;tw(G,'wfl',0,1.67);G.timers.push({t:.25,fn:()=>tw(G,'hudA',1,1.42,'sineOut')})}}}
- else{const a=G.inst.currentTime*1000;G.pos+=dt*1000*(G.rate||1)*(G.xr||1);if(Math.abs(G.pos-a)>40)G.pos=a;if(G.voc.readyState>0&&Math.abs(G.voc.currentTime-G.inst.currentTime)>.12)G.voc.currentTime=G.inst.currentTime}
+ else{const a=G.inst.currentTime*1000-(G.cne?(+cfg.off||0):0);G.pos+=dt*1000*(G.rate||1)*(G.xr||1);if(Math.abs(G.pos-a)>40)G.pos=a;if(G.voc.readyState>0&&Math.abs(G.voc.currentTime-G.inst.currentTime)>.12)G.voc.currentTime=G.inst.currentTime}
  const pos=G.pos;
  for(const l of tap)hitKey(l);
  for(const k of pressed){if(k in KM)hitKey(KM[k]);else if(k=='Digit5'||k=='Numpad5')G.xr=1;else if(k=='Digit6'||k=='Numpad6')toggleFc(G);else if(k=='Digit2'||k=='Numpad2')skipTime(G);if(k=='Escape'||k=='Enter'){pauseGame();return}}
@@ -246,7 +246,7 @@ function play(dt){
   const f=G.nf[n.l],cx=sx(n.l)+56;
   if(n.len){const len=(n.t+n.len-(n.hit?pos:n.t))*kk,top=n.hit?cy0:y,eh=vh(f.e)*.7;
    if(len>0&&(dn?top>0:top<H)){X.globalAlpha=n.miss?.3:.65;const tp=dn?0:top;if(dn){X.save();X.translate(0,top);X.scale(1,-1)}dr(G.na,f.p,cx-f.p.fw*.35-f.p.fx*.7,tp,vw(f.p)*.7,Math.max(0,len-eh));dr(G.na,f.e,cx-f.e.fw*.35-f.e.fx*.7,tp+Math.max(0,len-eh),vw(f.e)*.7,eh);if(dn)X.restore();X.globalAlpha=1}}
-  if(!n.hit){if(G.noteTint){if(n.tint==null)n.tint=G.noteTint();dfTint(G.na,f.h,cx-f.h.fw*.35,y-f.h.fh*.35,.7,n.miss?.3:1,n.tint)}else df(G.na,f.h,cx-f.h.fw*.35,y-f.h.fh*.35,.7,n.miss?.3:1)}}
+  if(!n.hit){if(G.cne&&cfg.pez&&!G.noteTint){dfTint(G.na,f.h,cx-f.h.fw*.35,y-f.h.fh*.35,.7,n.miss?.3:1,[0xC24B99,0x00FFFF,0x12FA05,0xF9393F][n.l])}else if(G.noteTint){if(n.tint==null)n.tint=G.noteTint();dfTint(G.na,f.h,cx-f.h.fw*.35,y-f.h.fh*.35,.7,n.miss?.3:1,n.tint)}else df(G.na,f.h,cx-f.h.fw*.35,y-f.h.fh*.35,.7,n.miss?.3:1)}}
  X.imageSmoothingEnabled=true;
  // hud
  G.sp=G.sp.filter(o=>{o.t+=dt;const q=G.spl.get('splash star '+COL[o.l]+' '),i=Math.floor(o.t*24);if(i>=q.length)return false;const f=q[i];df(G.spl,f,sx(o.l)+56-f.fw/2,SY+55-f.fh/2);return true});
@@ -417,7 +417,7 @@ function fxTex(src,dynamic){const gl=FX.gl;let t=FX.tex.get(src);if(t&&!dynamic)
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);return t}
 // run shader `sh` ({name, u:{uniforms}}) over src (whole texture, or the sub-rect uv=[u0,v0,u1,v1]) into FX.cv (w x h); returns FX.cv or null
-function fxRun(sh,src,w,h,uv,dynamic){if(!fxGL())return null;const P=fxProg(sh.name);if(!P)return null;const gl=FX.gl;
+function fxRun(sh,src,w,h,uv,dynamic){if(cfg.shd===0&&S=='play'&&g&&g.cne)return null;if(!fxGL())return null;const P=fxProg(sh.name);if(!P)return null;const gl=FX.gl;
  if(FX.cv.width!==w||FX.cv.height!==h){FX.cv.width=w;FX.cv.height=h}gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
  gl.useProgram(P.p);const [u0,v0,u1,v1]=uv||[0,0,1,1];
  gl.bindBuffer(gl.ARRAY_BUFFER,FX.buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,1,u0,v0, 1,1,u1,v0, -1,-1,u0,v1, 1,-1,u1,v1]),gl.STREAM_DRAW);
@@ -429,6 +429,38 @@ function fxRun(sh,src,w,h,uv,dynamic){if(!fxGL())return null;const P=fxProg(sh.n
 function fxChain(canvas,shaders){let cur=canvas;for(const sh of shaders){if(sh.off)continue;const out=fxRun(sh,cur,canvas.width,canvas.height,null,true);if(!out)continue;
  const c2=fxChain.tmp||(fxChain.tmp=document.createElement('canvas'));if(c2.width!==canvas.width||c2.height!==canvas.height){c2.width=canvas.width;c2.height=canvas.height}const x=c2.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c2.width,c2.height);x.drawImage(out,0,0);
  const cx=canvas.getContext('2d');cx.setTransform(1,0,0,1,0,0);cx.globalAlpha=1;cx.globalCompositeOperation='source-over';cx.clearRect(0,0,canvas.width,canvas.height);cx.drawImage(c2,0,0);cur=canvas}return canvas}
+// Hello John Doe: the pixel + lag look, using Hello Again's own JPG.frag and jpeg_artifacts.frag (as set up in its april fools.hx)
+FX.src.JPG=`#pragma header
+uniform float pixel_size;
+void main()
+{
+	vec2 blocks = openfl_TextureSize / pixel_size;
+	gl_FragColor = flixel_texture2D(bitmap, floor(openfl_TextureCoordv * blocks) / blocks);
+}`;
+FX.src.jpeg_artifacts=`#pragma header
+uniform float blockSize;
+uniform float quality;
+vec3 rgb2ycbcr(vec3 rgb) {
+    return vec3(0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b, -0.1687 * rgb.r - 0.3313 * rgb.g + 0.5 * rgb.b + 0.5, 0.5 * rgb.r - 0.4187 * rgb.g - 0.0813 * rgb.b + 0.5);
+}
+vec3 ycbcr2rgb(vec3 ycbcr) {
+    return vec3(ycbcr.r + 1.402 * (ycbcr.b - 0.5), ycbcr.r - 0.34414 * (ycbcr.g - 0.5) - 0.71414 * (ycbcr.b - 0.5), ycbcr.r + 1.772 * (ycbcr.g - 0.5));
+}
+void main() {
+    vec2 uv = getCamPos(openfl_TextureCoordv);
+    vec4 color = textureCam(bitmap, uv);
+    vec3 ycbcr = rgb2ycbcr(color.rgb);
+    float blockQuality = quality * blockSize;
+    vec2 blockPos = floor(uv * openfl_TextureSize.xy / blockSize);
+    vec2 blockCoord = floor(fract(uv * openfl_TextureSize.xy / blockSize) * blockQuality) / blockQuality;
+    vec2 quantizedCoord = (blockPos * blockSize + blockCoord) / openfl_TextureSize.xy;
+    vec4 quantizedColor = textureCam(bitmap, quantizedCoord);
+    vec3 quantizedYCbCr = rgb2ycbcr(quantizedColor.rgb);
+    gl_FragColor = vec4(ycbcr2rgb(vec3(ycbcr.r, quantizedYCbCr.gb)), color.a);
+}`;
+const HJDPOST=[{name:'jpeg_artifacts',u:{quality:.001,blockSize:8}},{name:'JPG',u:{pixel_size:2}}];
+function hjdPost(){try{fxChain(cv,HJDPOST)}catch(e){}}
+const FLASH=()=>cfg.flash!==0;
 const SH=(name,u)=>{fxLoad(name);return{name,u:u||{}}};
 // a frame drawn through a sprite shader: the shader sees atlas UVs like OpenFL does
 function fxFrame(sh,at,f){if(!sh||sh.off||f.r)return null;const im=at.im;return fxRun(sh,im,Math.max(1,f.w),Math.max(1,f.h),[f.x/im.width,f.y/im.height,(f.x+f.w)/im.width,(f.y+f.h)/im.height],false)}
@@ -476,6 +508,7 @@ class FT extends FS{constructor(x,y,fieldWidth,text,size){super(x,y);Object.assi
  set font(v){if(v!==this._font){this._font=v;this.regen()}}get font(){return this._font}
  set alignment(v){this._align=v;this.regen()}get alignment(){return this._align}
  set fieldWidth(v){this._fw=v;this.regen()}get fieldWidth(){return this._fw}
+ set underline(v){v=!!v;if(v!==!!this._ul){this._ul=v;this.regen()}}get underline(){return !!this._ul}
  set bold(v){this._bold=!!v;this.regen()}get bold(){return this._bold}
  set italic(v){this._italic=!!v;this.regen()}get italic(){return this._italic}
  set textColor(v){this._col=v&0xFFFFFF;this.regen()}get textColor(){return this._col}
@@ -483,7 +516,7 @@ class FT extends FS{constructor(x,y,fieldWidth,text,size){super(x,y);Object.assi
  regen(){const c=this.cv,x=c.getContext('2d'),sz=this._size0,fnt=(this._italic?'italic ':'')+(this._bold?'bold ':'')+sz+'px '+this._font+', Arial';x.font=fnt;
   const lines=this._t.split('\n'),lh=Math.round(sz*1.17),tw=Math.max(1,...lines.map(l=>x.measureText(l).width)),w=Math.ceil(this._fw>0?this._fw:tw+4),h=Math.ceil(lines.length*lh+4);
   c.width=w;c.height=h;x.font=fnt;x.textBaseline='top';x.fillStyle=cssCol(this._col);
-  lines.forEach((l,i)=>{const lw=x.measureText(l).width,lx=this._align=='center'?(w-lw)/2:this._align=='right'?w-lw-2:2;if(this._border&&this._border.size>0){x.strokeStyle=cssCol(this._border.col);x.lineWidth=this._border.size*2;x.strokeText(l,lx,2+i*lh)}x.fillText(l,lx,2+i*lh)});
+  lines.forEach((l,i)=>{const lw=x.measureText(l).width,lx=this._align=='center'?(w-lw)/2:this._align=='right'?w-lw-2:2;if(this._border&&this._border.size>0){x.strokeStyle=cssCol(this._border.col);x.lineWidth=this._border.size*2;x.strokeText(l,lx,2+i*lh)}x.fillText(l,lx,2+i*lh);if(this._ul)x.fillRect(lx,2+i*lh+sz*1.02,lw,Math.max(1,sz/14))});
   const ow=this.width,oh=this.height;this.img=c;this.at=null;this.solid=null;this.width=w;this.height=h;this.origin={x:w/2,y:h/2};this.offset={x:0,y:0}}}
 // groups: FlxGroup draws members in order; FlxSpriteGroup also offsets them and multiplies alpha
 class FG{constructor(x,y,spriteGroup){Object.assign(this,{members:[],visible:true,alpha:1,cam:null,x:x||0,y:y||0,sg:!!spriteGroup,kind:'group'})}
@@ -515,7 +548,7 @@ function ftick(G,dt){if(!G.ftw)return;const keep=[];for(const tw of G.ftw){if(!t
   if(p>=1){if(tw.type=='pingpong'||tw.type=='looping'){tw.t-=tw.d;if(tw.type=='pingpong')tw.dir*=-1;keep.push(tw)}else if(tw.onComplete)tw.onComplete(tw)}else keep.push(tw)}
  G.ftw=keep.concat((G.ftw||[]).filter(t=>!G.ftw.includes(t)&&false))}
 const cancelTweensOf=(o,keys)=>{const G=G0();if(!G.ftw)return;for(const tw of G.ftw)if(tw.o===o&&(!keys||tw.list.some(l=>keys.includes(l.key))))tw.active=false};
-const G0=()=>g;
+let CTX=null;const G0=()=>CTX||g;
 function ftimer(sec,fn,loops){const G=G0(),tm={t:sec,d:sec,fn,loops:loops==null?1:loops,n:0,active:true,cancel(){this.active=false},get elapsedLoops(){return this.n}};(G.ftm=G.ftm||[]).push(tm);return tm}
 function ftimerTick(G,dt){if(!G.ftm)return;const list=G.ftm;G.ftm=[];for(const tm of list){if(!tm.active)continue;tm.t-=dt;if(tm.t<=0){tm.n++;tm.fn(tm);if(tm.loops===0||tm.n<tm.loops){tm.t+=tm.d;G.ftm.push(tm)}else tm.active=false}else G.ftm.push(tm)}}
 const lerpColor=(a,b,r)=>{const ch=(c,s)=>(c>>s)&255,m=(s)=>Math.round(ch(a,s)+(ch(b,s)-ch(a,s))*r);return(m(16)<<16)|(m(8)<<8)|m(0)};
@@ -569,7 +602,8 @@ const EZ=(()=>{const bo=t=>{const n=7.5625,d=2.75;if(t<1/d)return n*t*t;if(t<2/d
 const twE=(o,k,to,d,fn)=>{if(!(d>0)){o[k]=to;return}T.push({o,k,a:o[k],b:to,d,e:fn,t:0})};
 const cancelTwK=(o,ks)=>{T=T.filter(q=>!(q.o===o&&ks.includes(q.k)))};
 async function cneList(){if(CNE.list)return CNE.list;let l;try{l=await J(CNE.root+'songs.json')}catch(e){return[]}
- CNE.list=l.map(e=>typeof e=='string'?{id:e}:e).map(e=>({n:'hajd:'+e.id,label:e.name||e.id,diff:e.diff,soon:0}));return CNE.list}
+ const list=l.map(e=>typeof e=='string'?{id:e}:e).map(e=>({n:'hajd:'+e.id,label:e.name||e.id,diff:e.diff,soon:0,meta:{}}));
+ await Promise.all(list.map(async e=>{try{e.meta=await J(CNE.root+'songs/'+e.n.slice(5)+'/meta.json');if(e.meta.displayName)e.label=e.meta.displayName}catch(x){}}));CNE.list=list;return list}
 // Several audio tracks that behave like one <audio> (per-strumline vocals: Voices-<suffix>.ogg). volume = the player's tracks.
 class MultiAudio{constructor(tracks){this.tr=tracks;this._v=1}
  play(){return Promise.all(this.tr.map(t=>t.a.play().catch(()=>{})))}pause(){this.tr.forEach(t=>t.a.pause())}
@@ -616,6 +650,8 @@ async function cneLoad(folder){const e=(CNE.list||[]).find(s=>s.n=='hajd:'+folde
  let chart=null;for(const df of[e.diff,'normal','hard','easy'].filter(Boolean)){try{chart=await J(base+'charts/'+df+'.json');break}catch(_){}}if(!chart)throw Error('No chart found in '+A+base+'charts/');
  let extra=[];try{extra=(await J(base+'events.json')).events||[]}catch(_){}
  const evs=[...(chart.events||[]),...extra].sort((a,b)=>a.time-b.time),SL=chart.strumLines||[],typeOf=i=>SL[i]?SL[i].type:0;
+ // player strum x (PlayState: StrumLine.calculateStartingXPos(strumLinePos...) or strumPos[0]) + hudStuffs' +10; 0.5 = middle of the screen
+ CNE.plX=(()=>{const p=SL.find(s=>s.type==1)||{},pos=p.strumLinePos!=null?p.strumLinePos:.75,sc=p.strumScale||1,sp=p.strumSpacing||1,kc=p.keyCount||4;return(p.strumPos&&p.strumPos[0]?p.strumPos[0]:1024*pos-(112*sc*(kc/2-.5)*sp+56*sc))+10})();
  const bpm0=fnum(meta.bpm,100),cuts=[];let cam=SL.findIndex(s=>s.type==0);if(cam<0)cam=0;
  for(const v of evs){if(v.name=='BPM Change')cuts.push({t:v.time,bpm:fnum(v.params&&v.params[0],bpm0)});else if(v.name=='Camera Movement')cuts.push({t:v.time,cam:v.params?parseInt(v.params[0]):0})}
  let end=0;for(const sl of SL)for(const n of sl.notes||[])end=Math.max(end,n.time+(n.sLen||0));end+=8000;
@@ -986,7 +1022,7 @@ CNES['asterisk']=async G=>{const K=cneKit(G),SS=G.stageSprites,house=SS.house,ho
  function superCinema(b){if(b=='no'){K.camGame.angle=0;if(cinema)cinema.cancel()}else{K.camGame.angle=3;if(cinema)cinema.cancel();cinema=ftw(K.camGame,{angle:-3},3,{ease:EZ('sine','InOut'),type:'pingpong'})}}
  const daTextes=['HYG5:[','%&9gP6','.:`/7+','m&04·6','!.#.;m','Mk.$d=','g%#$mA','su^+`s','lKiU6&','mmM%$o'],fakes=['HE IS\nHERE','GIVE ME\nTHE CHEESE','RUN','BEHIND YOU'],real=['PRESS SPACE'];for(const f of fakes)real.push(f,f,f);
  let doodoo=null;
- function errorTextDuds(boi){if(doodoo)doodoo.cancel();errorTextes.visible=true;if(!boi)theF.visible=true;doodoo=ftimer(.1,()=>{errorTextes.visible=theF.visible=false});
+ function errorTextDuds(boi){if(!FLASH())return;if(doodoo)doodoo.cancel();errorTextes.visible=true;if(!boi)theF.visible=true;doodoo=ftimer(.1,()=>{errorTextes.visible=theF.visible=false});
   theF.text=rndObj(real);theF.screenCenter();theF.x+=rndF(-50,50);theF.y+=rndF(-50,50);const s=rndF(2.5,3.5);theF.scale={x:s,y:s};theF.angle=rndF(-5,5);
   for(const t of errorTextes.members){t.text=rndObj(daTextes);t.screenCenter();t.x+=rndF(-300,300);t.y+=rndF(-300,300);const s2=rndF(2,4);t.scale={x:s2,y:s2};t.font=rndB()?'Merriweather':'Roboto Mono';t.angle=rndF(0,360)}}
  let cheeseCount=0,shakeItUp=false;
@@ -1021,7 +1057,7 @@ CNES['asterisk']=async G=>{const K=cneKit(G),SS=G.stageSprites,house=SS.house,ho
 CNES['cheeba']=async G=>{const K=cneKit(G),SS=G.stageSprites,walls=SS.isolation;const headAt=await K.frm('stages/cheeba/mac0head');
  // ----- stage (cornfield.hx) -----
  const rgb=SH('ColorSwap',{uTime:0}),contrast=SH('contrast',{contrast:1,saturation:1,brightness:0}),drunk=SH('drunk',{strength:0,daTime:0});let drunkMode=false,cycles=0;
- function stageDrunk(){drunkMode=!drunkMode;if(drunkMode){K.camGame.addShader(contrast);K.camGame.addShader(drunk);walls.shader=rgb;fnum2(0,.5,3,{ease:EZ('sine','InOut')},n=>{cycles=n});ftw(contrast.u,{saturation:10,contrast:1.5},3,{ease:EZ('sine','InOut')});ftw(drunk.u,{strength:1},3,{ease:EZ('sine','InOut')})}
+ function stageDrunk(){if(!FLASH())return;drunkMode=!drunkMode;if(drunkMode){K.camGame.addShader(contrast);K.camGame.addShader(drunk);walls.shader=rgb;fnum2(0,.5,3,{ease:EZ('sine','InOut')},n=>{cycles=n});ftw(contrast.u,{saturation:10,contrast:1.5},3,{ease:EZ('sine','InOut')});ftw(drunk.u,{strength:1},3,{ease:EZ('sine','InOut')})}
   else{cancelTweensOf(contrast.u);cancelTweensOf(drunk.u);ftw(contrast.u,{saturation:1,contrast:1},1,{ease:EZ('sine','InOut')});ftw(drunk.u,{strength:0},1,{ease:EZ('sine','InOut')});ftw(rgb.u,{uTime:Math.ceil(rgb.u.uTime)},1.5,{ease:EZ('sine','InOut')})}}
  // ----- song -----
  const dadow=K.cpu(1);if(dadow)dadow.al=0;let dud=false,hudFaded=false;
@@ -1029,12 +1065,12 @@ CNES['cheeba']=async G=>{const K=cneKit(G),SS=G.stageSprites,walls=SS.isolation;
  const banner=new FB().frames(headAt);[[0,12],[13,24],[25,36],[37,48]].forEach(([a,b],i)=>{const ix=[];for(let k=a;k<=b;k++)ix.push(k);banner.addIdx('head'+i,'head',ix,37);banner.addIdx('head'+(i+4),'head',ix.slice().reverse(),37)});banner.play('head0');
  banner.alpha=0;banner.velocity={x:200,y:200};banner.spacing={x:0,y:40};banner.color=0xCCCCFF;mins(G,midx(G,G.bf),banner,G.GAME);
  const fish=SH('fisheye',{MAX_POWER:0});
- walls.alpha=0;G.dad.al=0;G.bf.al=0;G.hudA=0;G.bf.d.camx+=175;dud=true;for(const o of hud)o.alpha=0;
+ walls.alpha=0;G.dad.al=0;G.bf.al=0;G.hudA=0;G.noPause=1;G.bf.d.camx+=175;dud=true;for(const o of hud)o.alpha=0;
  const beat=K.cro();let flipCheck=false,flipy=false,superDrunky=false,isDark=false,darkTw=null;
  function darkenIt(){if(darkTw)darkTw.cancel();const a=isDark?0x333355:WHITE,b=isDark?WHITE:0x333355;darkTw=fnum2(20,0,isDark?.5:.75,{ease:EZ('circ','Out')},n=>{walls.color=lerpColor(a,b,Math.floor(n)/20)});isDark=!isDark}
  const FONTS=['MArial','MArialI','vcr','DroidSerif','Merriweather','Montserrat','Roboto Mono'],COLS=[0xFFFF00,0xFF00FF,0x00FFFF,0xFF0000,0x00FF00,0x0000FF];
  const randCaps=t=>t.split('').map(c=>rndB()?c.toUpperCase():c.toLowerCase()).join('');
- const randColor=p=>rndObj(COLS.filter(c=>c!==p));
+ const randColor=p=>!FLASH()?p:rndObj(COLS.filter(c=>c!==p));
  function randItUp(t,scale){const posx=t.x+t.width/2,oh=t.height;t.textColor=randColor(t.textColor);t.text=randCaps(t.text);t.font=rndObj(FONTS);const s=(oh/t.height)*scale;t.scale={x:s,y:s};t.updateHitbox();t.x=posx-t.width/2;t.italic=rndB();t.bold=rndB()}
  return cneMulti([{fn:{flipIt(){flipCheck=!flipCheck},
    tweenAlphas(th){if(th=='mac is here')fnum2(0,20,2*beat,{ease:EZ('sine','InOut')},n=>{if(dadow)dadow.al=Math.floor(n)/20});
@@ -1047,11 +1083,11 @@ CNES['cheeba']=async G=>{const K=cneKit(G),SS=G.stageSprites,walls=SS.isolation;
    itsSuperDrunkTime(){stageDrunk();superDrunky=!superDrunky;if(!superDrunky){cancelTweensOf(banner);ftw(banner,{alpha:0},1,{ease:EZ('sine','Out')});cancelTweensOf(fish.u);ftw(fish.u,{MAX_POWER:0},1,{ease:EZ('sine','Out')});
      const tt=G.timeTxt;tt.scale={x:2,y:2};tt.font='MArial';tt.textColor=WHITE;tt.italic=false;tt.bold=false;tt.updateHitbox();tt.y=0;tt.screenCenter('X');G.timeName='time: ';
      const ht=G.hpText;ht.scale={x:1,y:1};ht.font='MArialI';ht.textColor=0x0000FF;ht.text='health';ht.italic=false;ht.bold=false;ht.updateHitbox();ht.x=G.hpUnder.x+G.hpUnder.width/2-ht.width/2}},
-   itsHeadTime(){darkenIt();K.camGame.addShader(fish);ftw(banner,{alpha:1},3,{ease:EZ('sine','In')});ftw(fish.u,{MAX_POWER:.25},1,{ease:EZ('sine','In')})}},
+   itsHeadTime(){darkenIt();if(FLASH())K.camGame.addShader(fish);ftw(banner,{alpha:1},3,{ease:EZ('sine','In')});ftw(fish.u,{MAX_POWER:.25},1,{ease:EZ('sine','In')})}},
   update(dt){if(drunkMode){drunk.u.daTime+=dt*2*cycles;rgb.u.uTime+=dt/5*cycles}if(G.starts[G.si].camSL==0&&dud){dud=false;G.bf.d.camx-=175}},
   beatHit(b){if(superDrunky){randItUp(G.timeTxt,2);G.timeTxt.y=G.topBar.y+G.topBar.height-G.timeTxt.height;G.timeName=randCaps(G.timeName);randItUp(G.hpText,1);banner.play('head'+(((b%8)+8)%8))}
    if(flipCheck){[K.camGame,K.camHUD].forEach((cam,i)=>{cam.angle=(i==0?2:1)*(flipy?1:-1);cancelTweensOf(cam,['angle']);ftw(cam,{angle:0},K.cro()-.05,{ease:EZ('quad','Out')})});flipy=!flipy}},
-  onSongStart(){fnum2(0,20,30*beat,{ease:EZ('sine','InOut')},n=>{G.bf.al=Math.floor(n)/20});ftimer(beat*28,()=>{fnum2(0,20,4*beat,{ease:EZ('sine','InOut')},n=>{G.hudA=Math.floor(n)/20})})}}])};
+  onSongStart(){fnum2(0,20,30*beat,{ease:EZ('sine','InOut')},n=>{G.bf.al=Math.floor(n)/20});ftimer(beat*28,()=>{G.noPause=0;fnum2(0,20,4*beat,{ease:EZ('sine','InOut')},n=>{G.hudA=Math.floor(n)/20})})}}])};
 // =====================================================================
 // commit die: data/stages/robloxhs.hx + "wlecome Boiiiii...hx" (+ data/scripts/april fools.hx, data/states/HJDElevator.hx)
 const AF_IMAGES=['034.png','06050321cabc47ba2b99686192ba9d01eeefe982ac8bdd25eef3ac497b5186d8_1.jpg','20240626_130549.jpg'];
@@ -1064,11 +1100,11 @@ CNES['commit die']=async G=>{const K=cneKit(G),SS=G.stageSprites,hs=SS.highschoo
  // ----- april fools: fonts, 20 fps, hypercam, deep-fried + jpeg shaders, random image flashes, random note colours -----
  G.fpsCap=20;G.timeTxt.font='sans';G.hpText.font='papyrus';G.hpText.italic=true;
  const hc=new FS().loadGraphic(hyper);hc.zoomFactor=0;hc.origin={x:0,y:0};hc.scale={x:2,y:2};madd(G,hc,G.HUD);
- K.camGame.addShader(SH('deepfry',{saturation:1.5,luminance:[.2125,.7154,.0721],contrast:1.5,noiseAmount:.1}));
- const jpeg=SH('jpeg_artifacts',{quality:.001,blockSize:8}),jpg=SH('JPG',{pixel_size:1});K.camGame.addShader(jpeg);K.camHUD.addShader(jpeg);K.camGame.addShader(jpg);K.camHUD.addShader(jpg);
+ if(FLASH()){K.camGame.addShader(SH('deepfry',{saturation:1.5,luminance:[.2125,.7154,.0721],contrast:1.5,noiseAmount:.1}));
+ const jpeg=SH('jpeg_artifacts',{quality:.001,blockSize:8}),jpg=SH('JPG',{pixel_size:1});K.camGame.addShader(jpeg);K.camHUD.addShader(jpeg);K.camGame.addShader(jpg);K.camHUD.addShader(jpg);}
  G.noteTint=()=>rndObj([0xFFFF00,0xFF00FF,0x00FFFF,0xFF0000,0x00FF00,0x0000FF]);
  const afImgs={};
- function painItUp(n){n=n||1;for(let i=0;i<n;i++){const f=rndObj(afList);const go=im=>{const b=new FS().loadGraphic(im);b.scale={x:W/im.width,y:H/im.height};b.origin={x:0,y:0};b.zoomFactor=0;mins(G,0,b,G.HUD);ftimer(rndF(.01,.2),()=>mrem(G,b))};if(afImgs[f])go(afImgs[f]);else L(CNE.root+'images/af/boiImagePack2017/'+f).then(im=>{afImgs[f]=im}).catch(()=>{})}}
+ function painItUp(n){if(!FLASH())return;n=n||1;for(let i=0;i<n;i++){const f=rndObj(afList);const go=im=>{const b=new FS().loadGraphic(im);b.scale={x:W/im.width,y:H/im.height};b.origin={x:0,y:0};b.zoomFactor=0;mins(G,0,b,G.HUD);ftimer(rndF(.01,.2),()=>mrem(G,b))};if(afImgs[f])go(afImgs[f]);else L(CNE.root+'images/af/boiImagePack2017/'+f).then(im=>{afImgs[f]=im}).catch(()=>{})}}
  for(const f of afList)L(CNE.root+'images/af/boiImagePack2017/'+f).then(im=>{afImgs[f]=im}).catch(()=>{});
  // ----- song: "its earthworm sally" video on the HUD, behind the notes -----
  const vid=new FV().load(CNE.root+'videos/its earthworm sally.mp4');let playing=false;vid.visible=false;mins(G,0,vid,G.HUD);K.camGame.visible=false;
@@ -1151,7 +1187,7 @@ function secretKeys(G,dt){const up=(held.Digit4||held.Numpad4)&&!('Digit4' in KM
 
 /* ---------- SETTINGS ---------- */
 const PRE={WASD:['KeyA','KeyS','KeyW','KeyD'],DFJK:['KeyD','KeyF','KeyJ','KeyK']};
-let cfg={bind:PRE.WASD.slice(),alt:['ArrowLeft','ArrowDown','ArrowUp','ArrowRight'],touch:0,pix:1,proof:0,hid:0,cz:1,cs:1,down:0,cm:1,ghost:1,ap:1,gh:1,mod:'hjd',soul:1};const SOUL={acc:0};
+let cfg={bind:PRE.WASD.slice(),alt:['ArrowLeft','ArrowDown','ArrowUp','ArrowRight'],touch:0,pix:1,pxs:1,lag:1,flash:1,shd:1,fr:60,off:0,pez:0,rui:0,dev:0,proof:0,hid:0,cz:1,cs:1,down:0,cm:1,ghost:1,ap:1,gh:1,mod:'hjd',soul:1};const SOUL={acc:0};
 try{Object.assign(cfg,JSON.parse(localStorage.jdset||'{}'))}catch(e){}
 const lab=c=>({ArrowLeft:'←',ArrowDown:'↓',ArrowUp:'↑',ArrowRight:'→',Space:'space'}[c]||c.replace(/^(Key|Digit)/,''));
 function buildKM(){KM={};cfg.alt.forEach((c,l)=>{if(c)KM[c]=l});cfg.bind.forEach((c,l)=>{if(c)KM[c]=l})}
@@ -1162,7 +1198,7 @@ const ARR=['ArrowLeft','ArrowDown','ArrowUp','ArrowRight'];
 const klab=c=>{if(!c||/^(Arrow|Enter|Escape|Shift|Control|Alt|Tab|Backspace|Delete|Home|End|Insert|Page|CapsLock|F\d)/.test(c))return'';const m={Space:' ',Slash:'/',Period:'.',Comma:',',BracketLeft:'[',BracketRight:']',Semicolon:';',Equal:'+',Minus:'-',Backquote:'`',Quote:'"',Backslash:'\\'};if(c in m)return m[c];if(/^Numpad\d$/.test(c))return c.slice(6);return c.replace(/^(Key|Digit)/,'')};
 const kname=c=>!c?'---':c.startsWith('Arrow')?c.slice(5).toUpperCase():c.replace(/^(Key|Digit)/,'').toUpperCase();
 /* OptionsState: buttons / visuals / gaemplay (random x + random spaces like the original); options from VisualsUISubState + GameplaySettingsSubState */
-const SOPT={visuals:[['hide hud','hid'],['camera zooms','cz'],['combo stacking','cs'],['pixel notes','pix'],['proof (show keys)','proof']],gaemplay:[['downscroll','down'],['copyrighted music','cm'],['ghost tapping','ghost'],['auto pause','ap'],['sustains as one note','gh']]};
+const SOPT={visuals:[['hide hud','hid'],['camera zooms','cz'],['combo stacking','cs'],['pixel notes','pix'],['pixel shader','pxs'],['fps lock (30)','lag'],['proof (show keys)','proof']],gaemplay:[['downscroll','down'],['copyrighted music','cm'],['ghost tapping','ghost'],['auto pause','ap'],['sustains as one note','gh']]};
 const SNAMES=['buttons','visuals','gaemplay'],CROWS=['Left','Down','Up','Right'];
 let SE={sel:0,wait:0,scr:'main',slot:0,off:300,words:SNAMES.slice()};buildKM();
 function reroll(){SE.off=100+Math.random()*550;SE.words=SNAMES.map(w=>[...w].map(c=>(Math.random()<.1?' ':'')+c).join(''))}
@@ -1202,11 +1238,11 @@ function sett(dt){
 const MODS=[{n:'Hello John Doe',id:'hjd',ok:1},{n:'Hello Again John Doe',id:'hajd',ok:0}];
 function refreshMods(){return cneList().then(l=>{MODS[1].ok=l.length?1:0}).catch(()=>{MODS[1].ok=0})}
 const MO={sel:0,msg:'',mt:0};
-function openMods(){refreshMods();MO.sel=Math.max(0,MODS.findIndex(m=>m.id==cfg.mod));MO.msg='';MO.mt=0;S='mods'}
+function openMods(){if(S!='hajd')MO.from='';refreshMods();MO.sel=Math.max(0,MODS.findIndex(m=>m.id==cfg.mod));MO.msg='';MO.mt=0;S='mods'}
 function mods(dt){const n=MODS.length,ry=i=>H/2-35*(n-1)+70*i,mv=d=>{MO.sel=(MO.sel+n+d)%n;MO.msg='';snd('sounds/click.ogg').play()};
- const choose=()=>{const m=MODS[MO.sel];if(!m.ok){MO.msg='Coming soon!';MO.mt=2;snd('sounds/lockSound.ogg').play();return}cfg.mod=m.id;saveCfg();snd('sounds/click.ogg').play();S='menu'};
- for(const k of pressed){if(k=='ArrowUp'||k=='KeyW')mv(-1);else if(k=='ArrowDown'||k=='KeyS')mv(1);else if(k=='Enter'||k=='Space')choose();else if(k=='Escape'||k=='Backspace'){snd('sounds/click.ogg').play();S='menu'}if(S!='mods')return}
- for(const[cx,cy]of clicks){if(touchOn()&&cx<120&&cy<50){S='menu';return}for(let i=0;i<n;i++)if(Math.abs(cy-ry(i))<30&&Math.abs(cx-W/2)<260){if(MO.sel==i)choose();else{MO.sel=i;MO.msg='';snd('sounds/click.ogg').play()}if(S!='mods')return}}
+ const choose=()=>{const m=MODS[MO.sel];if(!m.ok){MO.msg='Coming soon!';MO.mt=2;snd('sounds/lockSound.ogg').play();return}cfg.mod=m.id;saveCfg();snd('sounds/click.ogg').play();if(m.id=='hajd'){hajdStart().catch(e=>{err=e.message;S='err'});return}setRes(960,720);S='menu';MO.from='';if(M.music){M.music.currentTime=0;M.music.play().catch(()=>{})}};
+ for(const k of pressed){if(k=='ArrowUp'||k=='KeyW')mv(-1);else if(k=='ArrowDown'||k=='KeyS')mv(1);else if(k=='Enter'||k=='Space')choose();else if(k=='Escape'||k=='Backspace'){snd('sounds/click.ogg').play();if(MO.from=='hajd'&&cfg.mod=='hajd'){hajdStart();return}S='menu'}if(S!='mods')return}
+ for(const[cx,cy]of clicks){if(touchOn()&&cx<120&&cy<50){if(MO.from=='hajd'&&cfg.mod=='hajd'){hajdStart();return}S='menu';return}for(let i=0;i<n;i++)if(Math.abs(cy-ry(i))<30&&Math.abs(cx-W/2)<260){if(MO.sel==i)choose();else{MO.sel=i;MO.msg='';snd('sounds/click.ogg').play()}if(S!='mods')return}}
  if(MO.mt>0)MO.mt-=dt;
  X.fillStyle='#000';X.fillRect(0,0,W,H);X.textAlign='center';X.textBaseline='middle';
  X.font='40px MArial, Arial';X.fillStyle='#fff';X.fillText('mods',W/2,110);
@@ -1220,15 +1256,400 @@ addEventListener('keydown',e=>{if(e.repeat)return;if(e.code in KM||e.code=='Ente
  pressed.push(e.code);held[e.code]=1;keys.sh=e.shiftKey;if(e.code in KM)keys['L'+KM[e.code]]=1;
  if(S=='start'&&e.code=='Enter')boot();else if(S=='err'&&(e.code=='Enter'||e.code=='Escape'||e.code=='Space'))errBack()});
 addEventListener('unhandledrejection',e=>{const nm=e.reason&&e.reason.name;if(S=='load'&&!['NotAllowedError','AbortError','NotSupportedError'].includes(nm)){err=(e.reason&&e.reason.message)||String(e.reason);S='err';console.error(e.reason)}});
-function errBack(){err='';setRes(960);try{if(g){g.inst&&g.inst.pause();g.voc&&g.voc.pause();(g.vids||[]).forEach(v=>v.pause());stopSfx()}}catch(x){}g=null;T=[];if(M.music){S='menu';M.music.play().catch(()=>{})}else boot()}
+function errBack(){err='';setRes(960);try{if(g){g.inst&&g.inst.pause();g.voc&&g.voc.pause();(g.vids||[]).forEach(v=>v.pause());stopSfx()}}catch(x){}g=null;T=[];CTX=null;if(cfg.mod=='hajd'&&M.music){hajdStart().catch(()=>{cfg.mod='hjd';S='menu'});return}if(M.music){S='menu';M.music.play().catch(()=>{})}else boot()}
 addEventListener('keyup',e=>{held[e.code]=0;if(e.code in KM)keys['L'+KM[e.code]]=0});
-const clicks=[],tap=[],tl={};
+/* =====================================================================
+ HELLO AGAIN JOHN DOE MENUS: ports of data/states/HJD*.hx (+ MusicBeatTransition.hx, KeybindsOptions.hx, sus.hx)
+ and global.hx's volume tray. Each screen is a little Flixel state built from FLX-LITE objects (FS/FT/FG + FC cameras);
+ tweens and timers run on the state (CTX) instead of the song.
+ ===================================================================== */
+const HA={st:null,mus:null,musP:'',cache:{},from:null,last:null,retro:null,lastSong:null,load:null};
+const hsave=()=>{if(!HA.sv){try{HA.sv=JSON.parse(localStorage.hajdsave||'{}')}catch(e){HA.sv={}}HA.sv.scores=HA.sv.scores||{}}return HA.sv};
+const hsaveW=()=>{try{localStorage.hajdsave=JSON.stringify(hsave())}catch(e){}};
+const hscore=n=>hsave().scores[String(n).replace(/^hajd:/,'')]||{score:0,misses:0,acc:-1};
+const HKEY={up:['ArrowUp','KeyW'],down:['ArrowDown','KeyS'],left:['ArrowLeft','KeyA'],right:['ArrowRight','KeyD'],accept:['Enter','Space'],back:['Escape','Backspace']};
+const hjp=k=>pressed.some(c=>HKEY[k].includes(c));
+const hI=p=>HA.cache['i'+p]||(HA.cache['i'+p]=L(CNE.root+'images/'+p+'.png'));
+const hA=p=>HA.cache['a'+p]||(HA.cache['a'+p]=atlas(CNE.root+'images/'+p));
+const hTxt=async p=>{if(HA.cache['t'+p])return HA.cache['t'+p];let l=[''];try{l=(await TX(CNE.root+p)).split(/\r?\n/).map(s=>s.replace(/\s+$/,'')).filter(s=>s.trim())}catch(e){}return HA.cache['t'+p]=l};
+const hSnd=(p,v)=>{const a=snd(CNE.root+'sounds/'+p+'.ogg',0,v==null?1:Math.min(1,v));a.play().catch(()=>{});return a};
+const hMenuSfx=i=>hSnd('menu/'+['scroll','confirm','cancel'][i||0]);
+// CoolUtil.playMusic: keeps the track if it's already the one playing
+function hMusic(path,loop,vol){if(HA.musP===path&&HA.mus&&!HA.mus.paused)return HA.mus;if(HA.mus){HA.mus.onended=null;HA.mus.pause()}HA.musP=path;
+ const a=HA.mus=snd(CNE.root+'music/'+path+'.ogg',loop!==false,vol==null?1:vol);a.play().catch(()=>{});return a}
+function hMusicStop(){if(HA.mus){HA.mus.onended=null;HA.mus.pause()}HA.mus=null;HA.musP=''}
+const fpsLerp=(a,b,r,dt)=>a+(b-a)*(1-Math.pow(1-r,(dt||1/60)*60));
+const centerOnSprite=(s,c)=>{s.x=c.x+c.width/2-s.width/2;s.y=c.y+c.height/2-s.height/2};
+const graphicSize=(s,w,h)=>{w=w||0;h=h||0;if(w<=0&&h<=0)return s;const sx=w/s.fw,sy=h/s.fh;s.scale={x:w<=0?sy:sx,y:h<=0?sx:sy};s.updateHitbox();return s};
+// mouse in a camera's world (FlxG.mouse.getWorldPosition(camera)), optionally for a scroll factor
+const hPtr=()=>clicks.length?{x:clicks[0][0],y:clicks[0][1]}:MS;
+const hMouse=(cam,sf)=>{sf=sf==null?1:sf;const P=hPtr();return{x:(P.x-W/2)/cam.zoom+W/2+cam.scroll.x*sf,y:(P.y-H/2)/cam.zoom+H/2+cam.scroll.y*sf}};
+const hOver=(s,cam,sf)=>{if(!MS.on&&!clicks.length)return false;const p=hMouse(cam||HA.st.GAME,sf);return p.x>=s.x&&p.x<=s.x+s.width&&p.y>=s.y&&p.y<=s.y+s.height};
+const hClick=()=>clicks.length>0;
+// FlxFlicker
+function hFlicker(o,dur,iv,endVis,cb){const st=CTX;let t=0;const tm=ftimer(iv,()=>{t+=iv;o.visible=!o.visible;if(t>=dur-1e-6){o.visible=endVis;tm.cancel();if(cb)cb()}},0);return tm}
+// FlxTween.globalManager.completeAll() + FlxTimer.globalManager.completeAll(): finishes what's running now (their callbacks may start new ones)
+function hCompleteAll(st){const tws=(st.ftw||[]).slice(),tms=(st.ftm||[]).slice();
+ for(const tw of tws){if(!tw.active)continue;tw.active=false;const v=tw.e(1);for(const l of tw.list)l.obj[l.key]=l.b;if(tw.cb)tw.cb(tw.b);if(tw.onComplete)tw.onComplete(tw)}
+ for(const tm of tms){if(!tm.active)continue;tm.active=false;const n=tm.loops===0?1:tm.loops-tm.n;for(let i=0;i<n;i++){tm.n++;tm.fn(tm)}}
+ st.ftw=(st.ftw||[]).filter(t=>t.active);st.ftm=(st.ftm||[]).filter(t=>t.active)}
+function hNewState(name){const st={name,M:[],camList:[],ftw:[],ftm:[],t:0,mdx:0,mdy:0,lmx:null,lmy:null};st.GAME=new FC();st.camList.push(st.GAME);return st}
+// switch to a menu screen; builders are async (they load their images first)
+async function hGo(name,data){setRes(1024,768);const prev=HA.st;
+ if(prev&&prev.destroy)try{prev.destroy()}catch(e){}
+ const st=hNewState(name);st.data=data;S='load';LP.n=0;LP.t=0;LP.msg='';HA.load=prev&&prev!==st?prev:null;
+ CTX=st;try{await HSTATES[name](st,data)}catch(e){CTX=null;throw e}
+ HA.st=st;HA.load=null;CTX=st;S='hajd';return st}
+function hFrame(st,dt,noUpdate){const pc=CTX;CTX=st;st.t+=dt;
+ if(!noUpdate){st.mdx=st.lmx==null?0:MS.x-st.lmx;st.mdy=st.lmy==null?0:MS.y-st.lmy;st.lmx=MS.x;st.lmy=MS.y;
+  ftimerTick(st,dt);ftick(st,dt);if(st.update)st.update(dt);if(HA.st!==st&&S!='play')return;
+  for(const o of st.M)if(o&&o.update)o.update(dt)}
+ X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;X.fillStyle='#000';X.fillRect(0,0,W,H);
+ for(const c of st.camList)drawCam(st,c,dt);
+ if(st.post)st.post(dt);if(noUpdate)CTX=pc}
+function hajdLoop(dt){const st=HA.st;if(!st)return;hFrame(st,dt)}
+// the HAJD screen to show while a new one loads
+function hLoadDraw(){if(HA.load){hFrame(HA.load,0,true);return true}return false}
+
+/* ---------- start / switching between the two mods ---------- */
+async function hajdStart(){setRes(1024,768);if(M.music)M.music.pause();await cneList();await cneFonts(['DroidSerif']);
+ if(hsave().seenWarn)return hGo('main');return hGo('warn')}
+function hajdToMods(){hMusicStop();const st=HA.st;if(st&&st.destroy)try{st.destroy()}catch(e){}HA.st=null;CTX=null;setRes(960,720);MO.from='hajd';openMods()}
+
+/* ---------- global.hx: the volume tray (both mods) ---------- */
+const VOLM={v:1,muted:false,show:0,last:10,list:new Set()};
+try{const vs=localStorage.jdvol?JSON.parse(localStorage.jdvol):null;if(vs){VOLM.v=+vs.v;VOLM.muted=!!vs.m}}catch(e){}
+if(typeof HTMLMediaElement!='undefined'){const d=Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype,'volume');
+ if(d&&d.set){Object.defineProperty(HTMLMediaElement.prototype,'volume',{configurable:true,get(){return this._rv==null?1:this._rv},set(x){this._rv=x;VOLM.list.add(this);d.set.call(this,Math.max(0,Math.min(1,x*(VOLM.muted?0:VOLM.v))))}});
+  const pp=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(!VOLM.list.has(this))this.volume=this.volume;return pp.call(this)}}}
+function volApply(){for(const a of VOLM.list){if(a.ended||(a.paused&&!(a.currentTime>0)))VOLM.list.delete(a);a.volume=a.volume}try{localStorage.jdvol=JSON.stringify({v:VOLM.v,m:VOLM.muted})}catch(e){}}
+function volKeys(dt){let ch=0;
+ for(const k of pressed){if(S=='set'&&SE.wait)break;if(HA.st&&HA.st.rebinding)break;
+  if(k=='Minus'||k=='NumpadSubtract'){VOLM.muted=false;VOLM.v=Math.max(0,Math.round(VOLM.v*10-1)/10);ch=1}
+  else if(k=='Equal'||k=='NumpadAdd'){VOLM.muted=false;VOLM.v=Math.min(1,Math.round(VOLM.v*10+1)/10);ch=1}
+  else if(k=='Digit0'||k=='Numpad0'){VOLM.muted=!VOLM.muted;ch=1}}
+ if(ch){volApply();VOLM.show=1;const n=VOLM.muted?0:Math.round(VOLM.v*10);if(n!=VOLM.last||cfg.mod!='hajd'){try{const a=new Audio(A+CNE.root+'sounds/menu/volume.ogg');a.play().catch(()=>{})}catch(e){}}VOLM.last=n}
+ if(VOLM.show>0){VOLM.show-=dt;X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;X.fillStyle='#000';X.fillRect(0,0,W,40);X.fillStyle='#fff';X.font='30px MArial, Arial';X.textAlign='center';X.textBaseline='alphabetic';
+  X.fillText('volume: '+(VOLM.muted?0:Math.round(VOLM.v*10))+'/10',W/2,31)}}
+
+/* ---------- MusicBeatTransition.hx + HJDElevator.hx: the elevator ---------- */
+async function hElevator(st,cam){cam=cam||st.GAME;cam.zoom=1.6;
+ const [im,doors,diff,play,tv,cb,grad]=await Promise.all([hI('menu/rolbox/song/elevator'),hA('menu/rolbox/song/doors'),hA('menu/rolbox/song/diffbutton'),hA('menu/rolbox/song/play'),hA('menu/rolbox/song/tv'),hA('menu/rolbox/song/copyrightbutton'),hI('menu/rolbox/song/grad')]);
+ const E={};const el=E.elevator=new FS().loadGraphic(im).screenCenter();
+ const door=E.door=new FS().frames(doors).addPrefix('open','dooranim',24,false).addPrefix('opened','open',24,false).addIdx('close','dooranim',[15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0],24,false).addPrefix('closed','closed',24,false);door.x=el.x+347;door.y=el.y+146;
+ const aL=E.songArrowL=new FS(el.x+615,el.y+250).frames(diff).addPrefix('i','bidle').addPrefix('s','bpress').play('i');aL.flipY=true;
+ const aR=E.songArrowR=new FS(el.x+615,el.y+220).frames(diff).addPrefix('i','bidle').addPrefix('s','bpress').play('i');
+ const pb=E.enterSongButton=new FS(el.x+280,el.y+220).frames(play).addPrefix('i','pidle').addPrefix('s','ppress').play('i');
+ const mon=E.monitor=new FS().frames(tv).addPrefix('static','static',24,false).addPrefix('staticlooped','static',24,true).addPrefix('tv','tv',24,false).play('static');mon.finCb=n=>{if(n=='static')mon.play('tv')};
+ mon.scale={x:.95,y:.95};mon.x=el.x+150*el.scale.x;mon.y=el.y;
+ if(HA.retro==null)HA.retro=rndInt(1,2);const sn=E.songName=new FT(0,0,0,'',Math.floor(20/HA.retro));sn.scale={x:HA.retro,y:HA.retro};sn.updateHitbox();sn.text='boi';sn.fieldWidth=W;sn.alignment='center';sn.y=el.y+112;
+ const bar=E.bar=new FS().makeGraphic(1300,141,0xFF000000).screenCenter();bar.setGraphicSize(400);bar.y=105;bar.alpha=.6;
+ const ss=E.ssong=new FT(0,0,0,'now playing:',14);ss.color=0x00FF00;centerOnSprite(ss,bar);ss.y+=-13;
+ const cbt=E.cButton=new FS().frames(cb).addPrefix('copyright','c',24,false).addPrefix('nocopyright','nc',24,false);cbt.play(cfg.cm?'copyright':'nocopyright');cbt.offset.x=cfg.cm?0:2.5;centerOnSprite(cbt,bar);cbt.scale={x:.75,y:.75};cbt.x+=170;
+ const ov=E.overlay=new FS().loadGraphic(grad).screenCenter();
+ for(const o of[el,door,aL,aR,pb,mon,sn,bar,ss,cbt,ov])madd(st,o,cam);
+ return E}
+// MusicBeatTransition (transition out): door opened at zoom 4 -> 1.6, the door closes, then the next screen
+async function hTransOut(next,data){const st=await hGo('trans');st.next=[next,data];return st}
+
+/* ---------- HJDWarningState.hx ---------- */
+const HSTATES={};
+HSTATES.warn=async st=>{
+ const warnings=[["FLASHING LIGHTS !!\n\nturn this off if you are prone to seizures\n\nyou can also find this in options:\n\nappearance -> flashing menu",'flash'],
+  ["COPYRIGHTED MUSIC !!\n\nturn this off if you are youtube\n\nyou can also find this in options:\n\nhajd options -> copyrighted music",'cm']];
+ let warnId=0,isWarn=false,hoverYes=true;
+ const joshAt=await hA('menu/rolbox/josh');CTX=st;
+ hMusic('warning');
+ const josh=new FS(400,400);josh.scale={x:2.25,y:2.25};josh.zoomFactor=.75;josh.frames(joshAt).addPrefix('idle','joshdoe',20).play('idle');josh.alpha=0;madd(st,josh);
+ const title=new FT(0,0,0,'',48);title.scale={x:4,y:3};title.text='WARNING';title.updateHitbox();title.screenCenter('X');title.color=0xFF0000;title.alpha=0;madd(st,title);
+ const content=new FT(0,115,0,'',24);content.scale={x:2.5,y:1.5};content.text='this mod contains:';content.updateHitbox();content.screenCenter('X');content.color=0xFFFF00;content.alpha=0;madd(st,content);
+ const warning=new FT(0,0,0,'',24);warning.alignment='center';warning.scale={x:1.5,y:1.5};warning.alpha=0;madd(st,warning);
+ const yes=new FT(150,650,0,'',24);yes.scale={x:3,y:3};yes.text='on';yes.alpha=0;madd(st,yes);
+ const no=new FT(850,650,0,'',24);no.scale={x:3,y:3};no.text='off';no.alpha=0;madd(st,no);
+ const cam=st.GAME;cam.zoom=.85;
+ const loadWarn=id=>{let wait=false;
+  if(warning.alpha!=0){wait=true;isWarn=false;hMenuSfx(1);cfg[warnings[warnId][1]]=hoverYes?1:0;saveCfg();
+   fnum2(20,0,1,{ease:EZ('sine','In')},n=>{warning.alpha=yes.alpha=no.alpha=Math.floor(n)/20})}
+  ftimer(wait?1:1e-6,()=>{
+   if(id>=warnings.length){ftw(cam,{zoom:.85},6,{ease:EZ('sine','InOut'),onComplete:()=>{hsave().seenWarn=true;hsaveW();hGo('main')}});
+    fnum2(20,0,4,{ease:EZ('sine','In')},n=>{cam.alpha=Math.floor(n)/20;if(HA.mus)HA.mus.volume=cam.alpha})}
+   else{hSnd('scary',.75);warnId=id;warning.text=warnings[id][0];warning.updateHitbox();warning.screenCenter();
+    fnum2(0,20,1,{ease:EZ('sine','Out'),onComplete:()=>{isWarn=true}},n=>{warning.alpha=yes.alpha=no.alpha=Math.floor(n)/20})}})};
+ ftw(cam,{zoom:1},6,{ease:EZ('sine','InOut'),onComplete:()=>loadWarn(0)});
+ fnum2(0,20,4,{ease:EZ('sine','Out')},n=>{josh.alpha=(Math.floor(n)/20)*.4});
+ ftimer(2,()=>{fnum2(0,20,1.5,{ease:EZ('sine','Out')},n=>{title.alpha=Math.floor(n)/20});fnum2(0,20,3,{ease:EZ('sine','Out')},n=>{content.alpha=Math.floor(n)/20})});
+ st.update=()=>{if(isWarn){yes.color=hoverYes?0xFFFF00:WHITE;no.color=!hoverYes?0xFFFF00:WHITE;if(hjp('left')||hjp('right')){hMenuSfx();hoverYes=!hoverYes}
+   for(const[cx,cy]of clicks){if(cy>600){const y=cx<W/2;if(y!==hoverYes){hMenuSfx();hoverYes=y}else{loadWarn(warnId+1);return}}}
+   if(hjp('accept'))loadWarn(warnId+1)}else yes.color=no.color=WHITE}};
+
+/* ---------- HJDMenuState.hx ---------- */
+HSTATES.main=async st=>{
+ const items=['jams','members','settings','JOHN DISCORD NOW'];let cur=0;
+ const [fireAt,logoAt,againAt]=await Promise.all([hA('menu/rolbox/sm/fire'),hA('menu/rolbox/sm/logo'),hA(rndB(10)?'menu/rolbox/sm/agian':'menu/rolbox/sm/AGAIN')]);CTX=st;
+ hMusic('freakyMenu');const cam=st.GAME;
+ const fire=new FS().frames(fireAt).addPrefix('i','fire',24).play('i');fire.scrollFactor={x:0,y:0};madd(st,fire);
+ const logo=new FS(0,50).frames(logoAt).addPrefix('i','appear',24,false).addIdx('boi','appear',[26],24,false).play('i');logo.screenCenter('X');logo.scrollFactor={x:.5,y:.5};madd(st,logo);logo.scale={x:1.25,y:1.25};
+ const again=new FS(300,125).frames(againAt).addPrefix('fire','fire',24).play('fire');again.scale={x:.7,y:.7};again.angle=-12;again.scrollFactor={x:.6,y:.6};madd(st,again);
+ const stretchy=snd(CNE.root+'sounds/stretch.ogg',1,0);stretchy.play().catch(()=>{});let notBounced=false;
+ const menu=new FG();madd(st,menu);
+ const jit=rndInt(0,items.length);
+ items.forEach((n,i)=>{const sc=rndInt(1,4),tx=new FT(0,350+i*70,0,n,40);tx.size=Math.floor(40/sc);tx.scale={x:sc,y:sc};tx.updateHitbox();tx.screenCenter('X');
+  if(i==jit){tx.x+=rndInt(5,20);tx.y+=rndInt(-10,0)}tx.scrollFactor=i==1?{x:.8,y:.8}:{x:.7,y:.7};menu.add(tx)});
+ let selected=true,intro=false,buddy=null,boi=null;
+ // spawn()
+ again.alpha=0;graphicSize(fire,0,H);const fsc=fire.scale.y;fire.scale.y=0;logo.visible=false;for(const m of menu.members)m.visible=false;
+ buddy=fnum2(0,fsc,2,{onComplete:()=>{logo.visible=true;logo.play('i',true);again.scale={x:3,y:3};again.x+=200;again.y+=100;again.angle+=720;
+   boi=ftimer(1.5,()=>{ftw(again,{alpha:1,x:300,y:125,'scale.x':.7,'scale.y':.7,angle:-12},.5,{onComplete:()=>{hSnd('glassBreak');cam.shake(.05,.5);ftimer(.5,()=>{for(const m of menu.members)m.visible=true;selected=false;intro=true})}})})}},
+  f=>{fire.scale.y=f;fire.updateHitbox();fire.y=H-fire.height+25});
+ const changeItem=(d,ps)=>{if(d&&ps!==false)hSnd('menu/scroll');menu.members[cur].color=WHITE;cur=((cur+d)%items.length+items.length)%items.length;menu.members[cur].color=0xFFFF00};
+ changeItem(0);
+ const superBounds=i=>{const p=hMouse(cam),m=menu.members;let mn=m[i].y,mx=mn+50;if(i==0)mn-=50;if(i!=m.length-1)mx=m[i+1].y;return p.y>=mn&&p.y<=mx};
+ st.destroy=()=>{stretchy.pause()};
+ st.update=dt=>{
+  if(pressed.includes('Tab')||pressed.includes('Escape')){hajdToMods();return}
+  if(!selected){
+   if(hjp('up')||hjp('down'))changeItem(hjp('up')?-1:1);
+   let onItem=false;const old=cur;
+   menu.members.forEach((it,i)=>{if(hOver(it,cam))onItem=true;if(MS.on&&(st.mdx||st.mdy)&&superBounds(i)&&!MSD.down)changeItem(i-cur,false)});
+   if(old!=cur)hSnd('menu/scroll');
+   let clickSel=false;
+   if(hjp('accept')||(hClick()&&onItem)){clickSel=true;if(HA.mus)HA.mus.pause();hSnd('menu/confirm');selected=true;
+    hFlicker(menu.members[cur],1,.06,false,()=>{const it=menu.members[cur];
+     switch(items[cur]){
+      case 'jams':if(hscore('hello again').score==0){it.visible=true;fnum2(20,0,1,{ease:EZ('sine','In'),onComplete:()=>hStartSong('hajd:hello again')},n=>{cam.alpha=Math.floor(n)/20})}else hGo('play');break;
+      case 'members':hGo('cred');break;
+      case 'settings':hGo('opt',{ret:'main'});break;
+      default:try{open('https://discord.gg/mkuZtzZBqw','_blank')}catch(e){}ftimer(.25,()=>{it.visible=true;selected=false;if(HA.mus)HA.mus.play().catch(()=>{})})}})}
+   if(MSD.down&&!clickSel&&MS.on){if(!notBounced){notBounced=true;hSnd('sm64');hSnd('sm64')}cancelTweensOf(cam.scroll);cam.scroll.x-=st.mdx/2;cam.scroll.y-=st.mdy/2}
+   else if(notBounced){notBounced=false;hSnd('wobble');hSnd('wobble');ftw(cam.scroll,{x:0,y:0},1,{ease:EZ('elastic','Out')})}}
+  stretchy.volume=Math.min(1,Math.abs((cam.scroll.x+cam.scroll.y)/2)/100);
+  if(!intro&&(hjp('accept')||hClick())){intro=true;selected=false;for(const m of menu.members)m.visible=true;if(buddy)buddy.cancel();graphicSize(fire,0,H);fire.updateHitbox();fire.y=H-fire.height+25;
+   if(boi)boi.cancel();cancelTweensOf(again);again.alpha=1;again.scale={x:.7,y:.7};again.angle=-12;again.x=300;again.y=125;logo.visible=true;logo.play('boi',true)}}};
+
+/* ---------- HJDPlayMenu.hx ---------- */
+HSTATES.play=async(st,data)=>{
+ const E=await hElevator(st);const cam=st.GAME,{elevator:el,door,monitor,songName,songArrowL,songArrowR,enterSongButton,cButton,overlay,bar}=E;
+ const [starAt,lockI,holdI,hidden,loading,lists]=await Promise.all([hA('menu/rolbox/song/i_just_lost_my_dawggg'),hI('menu/rolbox/song/360'),hI('menu/rolbox/logoHolder'),hTxt('data/texts/hiddenTexts.txt'),hTxt('data/texts/loadingTexts.txt'),J(CNE.root+'music/list.json').catch(()=>({free:[],copyright:[]}))]);CTX=st;
+ const retro=rndInt(1,2);const score=new FT(0,0,0,'',Math.floor(20/retro));score.scale={x:retro,y:retro};score.text='penisSocre';score.updateHitbox();mins(st,midx(st,overlay),score);centerOnSprite(score,monitor);score.y+=30;
+ const k=new FT(0,0,0,' ',16);madd(st,k);
+ const fc=new FS(el.x+613,el.y+186).frames(starAt).addPrefix('none','outline',24).addPrefix('complete','bronze',24).addPrefix('fc','silver',24).addPrefix('pfc','golden',24);fc.setGraphicSize(30);fc.updateHitbox();fc.play('none');madd(st,fc);fc.visible=false;
+ const lock=new FS().loadGraphic(lockI);lock.scale={x:.5,y:.5};lock.updateHitbox();centerOnSprite(lock,{x:door.x,y:door.y,width:door.fw,height:door.fh});madd(st,lock);lock.visible=false;
+ const fuck=new FS().loadGraphic(holdI);fuck.scale={x:.5,y:1.5};fuck.updateHitbox();centerOnSprite(fuck,{x:door.x,y:door.y,width:door.fw,height:door.fh});madd(st,fuck);fuck.visible=false;
+ const goBro=new FT(195,150,0,'',10);goBro.font='MArialI';goBro.alignment='left';goBro.scale={x:1.75,y:1.75};goBro.text='CLIKC HERE\n2GO BAKC';goBro.updateHitbox();goBro.alpha=0;madd(st,goBro);
+ const centerK=()=>{centerOnSprite(k,bar);k.y+=6};
+ // the bar's hitbox is still 1300x141 (setGraphicSize without updateHitbox), like the mod
+ const updateMusic=song=>{if(song==null){const fr=lists.free||[],cp=lists.copyright||[],all=cfg.cm?fr.concat(cp.map(n=>'\u0001'+n)):fr.slice();if(!all.length)return;
+   const pick=rndObj(all),isC=pick[0]=='\u0001',nm=isC?pick.slice(1):pick;const m=hMusic((isC?'copyright/':'free/')+nm,false);m.onended=()=>setTimeout(()=>{if(HA.st===st)updateMusic()},100);k.text=nm;centerK()}
+  else{const m=hMusic(song,false);m.onended=()=>{if(HA.st===st)updateMusic()};k.text=song.slice(song.lastIndexOf('/')+1);centerK()}};
+ updateMusic(data&&data.music||null);
+ const songs=CNE.list||[];let current=0,locked=false,fucked=false;
+ if(HA.lastSong)songs.forEach((s,i)=>{if(s.n==HA.lastSong)current=i});
+ const changeSong=(amt,mouse,sound)=>{amt=amt||0;if(sound!==false)hMenuSfx();current=((current+amt)%songs.length+songs.length)%songs.length;const s=songs[current],sc=hscore(s.n);
+  songName.text=s.label;monitor.play('static',true);score.text='score '+sc.score;fc.visible=true;
+  fc.play(sc.score==0?'none':sc.acc>=1&&sc.misses==0&&sc.acc!=-1?'pfc':sc.misses==0?'fc':'complete');
+  if(!mouse){if(amt>0){songArrowR.play('s',true);ftimer(.1,()=>songArrowR.play('i',true))}else if(amt<0){songArrowL.play('s',true);ftimer(.1,()=>songArrowL.play('i',true))}}
+  fuck.visible=fucked=false;
+  const req=(s.meta&&s.meta.customValues&&s.meta.customValues.lockRequirements);
+  if(req!=null){const notPlayed=String(req).split(',').filter(r=>!(hscore(r).score>0));if(!notPlayed.length)lock.visible=locked=false;else{lock.visible=locked=true;fc.visible=false;songName.text=rndObj(hidden)}}else lock.visible=locked=false};
+ changeSong(0,true,false);
+ // HJDPlayMenu: once the first 4 songs are done, mac's message.txt opens (shown here as a notepad window)
+ if(['hello again','plan b','zombaked','asterisk'].every(n=>hscore(n).score>0)&&!hsave().macsLittleMessage){hsave().macsLittleMessage=true;hsaveW();
+  TX(CNE.root+'songs/cheeba/message.txt').then(t=>{st.note=t}).catch(()=>{})}
+ const enterSong=()=>{if(locked||fucked){cam.shake(.01,.1);hSnd(locked?'lockSound':'error')}
+  else{songName.text=rndObj(loading);HA.lastLoading=songName.text;hStartSong(songs[current].n);hSnd('letsgo')}};
+ let isMouses=false;
+ st.update=dt=>{if(st.note){if(pressed.length||clicks.length)st.note=null;pressed.length=0;clicks.length=0;return}
+  if(hjp('back')){hGo('main');return}
+  if(hjp('up')||hjp('right'))changeSong(1);if(hjp('down')||hjp('left'))changeSong(-1);if(hjp('accept')){enterSong();if(S!='hajd')return}
+  [songArrowL,songArrowR,enterSongButton,cButton,goBro].forEach((b,i)=>{
+   if(hOver(b,cam)){if(i==4)b.underline=true;else b.scale={x:i==3?.8:1.1,y:i==3?.8:1.1};
+    if(hClick()&&HA.st===st)switch(i){case 0:changeSong(-1,true);break;case 1:changeSong(1,true);break;case 2:enterSong();break;case 3:cfg.cm=cfg.cm?0:1;saveCfg();if(!cfg.cm){cButton.play('nocopyright',true);cButton.offset.x=2.5;updateMusic()}else{cButton.play('copyright',true);cButton.offset.x=0}break;case 4:hGo('main')}
+    if(i<3){if(MSD.down)b.play('s');else b.play('i')}}
+   else if(i==4)b.underline=false;else b.scale={x:i==3?.75:1,y:i==3?.75:1}});
+  for(const c of['ArrowLeft','ArrowDown','ArrowUp','ArrowRight','KeyA','KeyS','KeyW','KeyD','Enter','Space','Escape','Backspace'])if(held[c])isMouses=false;
+  if(st.mdx||st.mdy)isMouses=true;goBro.alpha=isMouses?fpsLerp(goBro.alpha,1,.05,dt):fpsLerp(goBro.alpha,0,.025,dt)};
+ st.post=()=>{if(!st.note)return;const w=640,h=300,x0=(W-w)/2,y0=(H-h)/2;X.fillStyle='#fff';X.fillRect(x0,y0,w,h);X.fillStyle='#0a246a';X.fillRect(x0,y0,w,26);X.fillStyle='#fff';X.font='15px MArial, Arial';X.textAlign='left';X.fillText('message.txt - Notepad',x0+8,y0+18);
+  X.fillStyle='#000';X.font='14px "Lucida Console", monospace';const words=st.note.replace(/\r/g,'').split(/(\s+)/);let line='',y=y0+48;for(const wd of words){if(wd.includes('\n')){X.fillText(line,x0+10,y);y+=18;line='';continue}if(X.measureText(line+wd).width>w-24){X.fillText(line,x0+10,y);y+=18;line=wd.trimStart()}else line+=wd;if(y>y0+h-10)break}X.fillText(line,x0+10,y)}};
+
+/* ---------- HJDCreditsState.hx ---------- */
+HSTATES.cred=async st=>{
+ const cam=st.GAME;
+ const [skyI,moonI,groundI,moohnAt,musI,credAt,lines]=await Promise.all([hI('menu/rolbox/creds/sky'),hI('menu/rolbox/creds/moon'),hI('menu/rolbox/creds/ground'),hA('menu/rolbox/creds/moohndoe'),hI('menu/rolbox/creds/mus'),hA('menu/rolbox/creds/credassets'),hTxt('data/texts/superCreditsworld.txt')]);CTX=st;hMusic('credits');
+ const tweenCam={tw:null};cam.alpha=0;tweenCam.tw=fnum2(0,20,3,{ease:EZ('sine','Out')},n=>{cam.alpha=Math.floor(n)/20});
+ const sky=new FS().loadGraphic(skyI).screenCenter();sky.scrollFactor={x:.5,y:.5};
+ const moonhole=new FS(90,242).loadGraphic(moonI);moonhole.scrollFactor={x:.65,y:.65};
+ const ground=new FS().loadGraphic(groundI);ground.origin={x:1,y:1};ground.x=W-ground.width*1.6+5;ground.y=H-ground.height*1.6+5;
+ for(const d of[sky,moonhole,ground]){d.scale={x:1.6,y:1.6};madd(st,d)}
+ const moohnDoe=['hello again','plan b','zombaked','asterisk'].every(n=>hscore(n).score>0);let moon=null,moonfell=false;
+ if(moohnDoe){moonhole.color=0x000000;moon=new FS(90,242).frames(moohnAt).addPrefix('idle','idle',2).play('idle');moon.scrollFactor={x:.65,y:.65};moon.scale={x:1.6,y:1.6};madd(st,moon)}
+ cam.zoom=1.1;ground.scale.x=1.7;
+ const blacklist=[];for(const s of CNE.list||[]){const cv=s.meta&&s.meta.customValues||{};if(cv.lockRequirements!=null&&String(cv.lockRequirements).split(',').some(r=>!(hscore(r).score>0)))blacklist.push(s.label);if(cv.hideName!=null&&hscore(s.n).score==0)blacklist.push(s.label)}
+ const creds=new FG(),links=[];madd(st,creds);
+ lines.forEach((ln,i)=>{const p=ln.split(' | '),c=new FT(200,50+27*i,0,'',14);c.font='MArialI';c.alignment='left';c.scale={x:1.25,y:1.25};let tx=p[0]||'wait thats sus';
+  for(const b of blacklist)if(tx.includes(b))tx=tx.split(b).join('#'.repeat(b.length));c.text=tx;c.color=0xAAFFFF;c.updateHitbox();c.scrollFactor={x:.55,y:.55};creds.add(c);links.push(p[1]||'https://files.catbox.moe/vhgjr2.png')});
+ const songCred=new FT(0,0,0,'',16);songCred.text='2010 - terionic';songCred.font='DroidSerif';songCred.scale={x:2,y:2};songCred.updateHitbox();songCred.x=100;songCred.y=H-songCred.height-40;songCred.color=0xAAFFFF;songCred.blend='add';songCred.scrollFactor={x:0,y:0};madd(st,songCred);
+ const goBro=new FT(55,45,0,'',10);goBro.scrollFactor={x:0,y:0};goBro.font='MArialI';goBro.alignment='left';goBro.scale={x:2,y:2};goBro.text='CLIKC HERE\n2GO BAKC';goBro.updateHitbox();goBro.alpha=0;madd(st,goBro);
+ const note=new FS(70,H-78).loadGraphic(musI);note.scale={x:2,y:2};note.color=0xAAFFFF;note.blend='add';note.scrollFactor={x:0,y:0};madd(st,note);
+ const powers=SH('drunk',{daTime:0,strength:0});
+ const stars=new FG();mins(st,midx(st,moonhole),stars);
+ for(let i=0;i<3;i++){const s=new FS().frames(credAt).addPrefix('idle','stars'+(i+1),20).play('idle');s.scale={x:1.6,y:1.6};s.scrollFactor={x:.4+i*.1,y:.4+i*.1};stars.add(s);
+  if(i==0){s.x=sky.x+150;s.y=sky.y}else if(i==1){s.x=sky.x+125;s.y=sky.y+150}else{s.x=sky.x+25;s.y=sky.y}}
+ if(hscore('zombaked').score>0){const soul=new FS(600,260).frames(credAt).addPrefix('idle','zombaked',20).play('idle');soul.scale={x:1.4,y:1.4};soul.scrollFactor={x:.6,y:.6};soul.color=0x77FFFF;soul.alpha=.6;mins(st,midx(st,stars),soul)}
+ let sel=0,keyb=true,die=false;
+ const toSus=()=>{sky.shader=powers;ftw(powers.u,{strength:5},2);if(tweenCam.tw)tweenCam.tw.cancel();
+  ftw(cam,{zoom:3,alpha:0},2,{ease:EZ('sine','In'),onComplete:()=>hGo('sus')});ftw(cam.scroll,{x:-600,y:-200},2,{ease:EZ('sine','In')});
+  const m=HA.mus,t0=m?m.currentTime:0;ftimer(.2,tm=>{if(m){try{m.currentTime=t0}catch(e){}if(tm.n>=8)hMusicStop()}},8)};
+ const open_=u=>{try{open(u,'_blank')}catch(e){}};
+ st.update=dt=>{if(die){powers.u.daTime+=(dt*powers.u.strength)/1.5;return}
+  if(moohnDoe&&moonfell&&hClick()&&hOver(moonhole,cam,.65)){die=true;toSus();return}
+  if(moohnDoe&&!moonfell&&hClick()&&hOver(moon,cam,.65)){die=moonfell=true;hSnd('ohOk');hSnd('ohOk');ftimer(.2,()=>hSnd('fall',.6));
+   ftw(moon,{y:175},.275,{ease:EZ('sine','Out'),onComplete:()=>ftw(moon,{y:H},.6,{ease:EZ('sine','In'),onComplete:()=>{cam.shake(.025,.5);hSnd('death')}})});
+   ftimer(1,()=>toSus());ftw(moon,{x:-100,angle:-180},1);if(HA.mus)ftw(HA.mus,{playbackRate:.9},3);return}
+  if(hOver(songCred,cam,0)){if(!songCred.underline)hMenuSfx();songCred.underline=true;if(hClick())open_('https://soundcloud.com/2rionic/new-worlds')}else songCred.underline=false;
+  let back=false;if(hOver(goBro,cam,0)){if(!goBro.underline)hMenuSfx();goBro.underline=true;if(hClick())back=true}else goBro.underline=false;
+  if(hjp('back')||back){die=true;if(tweenCam.tw)tweenCam.tw.cancel();fnum2(cam.alpha*20,0,.5,{ease:EZ('sine','In'),onComplete:()=>hGo('main')},n=>{cam.alpha=Math.floor(n)/20});return}
+  const n=creds.members.length;if(hjp('up')){keyb=true;sel=(sel-1+n)%n;hMenuSfx()}if(hjp('down')){keyb=true;sel=(sel+1)%n;hMenuSfx()}if(hjp('accept'))open_(links[sel]);
+  if(st.mdx||st.mdy)keyb=false;
+  creds.members.forEach((c,i)=>{if(hOver(c,cam,.55)){if((st.mdx||st.mdy)&&sel!=i){sel=i;hMenuSfx()}if(hClick())open_(links[sel])}c.underline=sel==i});
+  if(keyb){cam.scroll.x=0;cam.scroll.y=fpsLerp(cam.scroll.y,H/(n*10)*sel*1.5-1.5*H/10+40,.1,dt);goBro.alpha=fpsLerp(goBro.alpha,0,.025,dt)}
+  else{cam.scroll.x=(MS.x-W/2)/10;cam.scroll.y=(MS.y-H/2)/10;goBro.alpha=fpsLerp(goBro.alpha,1,.05,dt)}}};
+
+/* ---------- sus.hx (behind the moon) ---------- */
+HSTATES.sus=async st=>{const cam=st.GAME;hMusic('sus');
+ const [forI,cornAt]=await Promise.all([hI('menu/rolbox/creds/sus/forest'),hA('menu/rolbox/creds/sus/cornplate')]);CTX=st;
+ const forest=new FS().loadGraphic(forI).screenCenter();forest.scrollFactor={x:.5,y:.5};madd(st,forest);
+ const corn=new FS().frames(cornAt).addPrefix('idle','idle',2).play('idle');corn.scrollFactor={x:.6,y:.6};corn.scale={x:1.1,y:1.1};corn.screenCenter();corn.y+=150;corn.alpha=0;madd(st,corn);
+ const powers=SH('drunk',{daTime:0,strength:0});
+ const t1=fnum2(0,20,3,{ease:EZ('circ','Out')},n=>{forest.alpha=Math.floor(n)/20}),t2=fnum2(0,20,4,{ease:EZ('sine','Out')},n=>{corn.alpha=Math.floor(n)/20});
+ let die=false;
+ st.update=dt=>{if(die){powers.u.daTime+=(dt*powers.u.strength)/1.5;return}
+  if(((hClick()&&hOver(corn,cam,.6))||hjp('accept'))&&!t1.active&&!t2.active){die=true;forest.shader=powers;ftw(powers.u,{strength:3},2);
+   ftw(cam,{zoom:3,alpha:0},2,{ease:EZ('sine','In'),onComplete:()=>hStartSong('hajd:cheeba')});ftw(cam.scroll,{x:0,y:200},2,{ease:EZ('sine','In')});if(HA.mus)ftw(HA.mus,{volume:0,playbackRate:.07},2)}
+  cam.scroll.x=(MS.x-W/2)/10;cam.scroll.y=(MS.y-H/2)/10}};
+
+/* ---------- HJDOptionsMenu.hx (+ KeybindsOptions.hx / ChangeKeybindSubState.hx) ---------- */
+// option -> [cfg key, type, min, max, step]   (custom_bool = FlxG.save.data, bool = Options; both live in cfg here)
+const HOPT={'fps lock':['soul','bool'],'framerate':['fr','number',30,240,10],'flashing lights':['flash','bool'],'shaders':['shd','bool'],'auto pause':['ap','bool'],'downscroll':['down','bool'],'rating ui':['rui','bool'],
+ 'ghost tapping':['ghost','bool'],'song offset':['off','number',-999,999,1],'camera zooms':['cz','bool'],'colorful notes':['pez','bool'],'copyrighted music':['cm','bool'],'developer mode':['dev','bool']};
+const hcv=k=>cfg[k]==null?0:cfg[k];
+HSTATES.opt=async(st,data)=>{
+ const kAt=await hA('menu/rolbox/k');CTX=st;const cam=st.GAME;
+ const LIST=[['buttons','visuals','gaemplay','misc'],[],['fps lock','framerate','colorful notes','flashing lights','shaders','auto pause'],['downscroll','rating ui','ghost tapping','song offset','camera zooms','copyrighted music'],['developer mode']];
+ {const tgt=rndInt(0,LIST[0].length-1);LIST[0][tgt]=[...LIST[0][tgt]].map(c=>(rndB(10)?' ':'')+c).join('')}
+ let sel=0,page=0;const texts=new FG(),dings=new FG();madd(st,texts);madd(st,dings);
+ const rawName=t=>t;
+ const showVal=(i,o)=>{const d=dings.members[i];if(!d)return;const v=hcv(o[0]);if(o[1]=='bool')d.play(v?'yes':'no',true);else d.text=String(v)};
+ const move=(which,ps)=>{if(ps!==false)hMenuSfx(which==0?2:1);page=which;
+  if(which!=1){const L_=LIST[which];texts.members=[];dings.members=[];const off=rndInt(100,650);
+   L_.forEach((n,i)=>{const t=new FT(0,i*24,0,n,40);t.alignment='center';t.screenCenter('Y');t.y+=(60*(i-L_.length/2))+50;t.x+=off;if(page>1){t.scale={x:.7,y:.7};t.x+=Math.sin(i)*2}texts.add(t);
+    if(page>1){const o=HOPT[n];if(o[1]=='bool'){const b=new FS(t.x+t.width+4+rndInt(4,16),t.y+12).frames(kAt).addPrefix('yes','yes',1,false).addPrefix('no','no',1,false);b.updateHitbox();dings.add(b)}
+     else{const h=new FT(t.x+t.width+4,t.y,0,'help me',40);dings.add(h)}showVal(i,o)}});
+   sel=0;changeSel(0)}
+  else hGo('keys',{back:st.data});};
+ const changeSel=d=>{if(d)hMenuSfx();if(page!=1&&texts.members.length)sel=((sel+d)%texts.members.length+texts.members.length)%texts.members.length;texts.members.forEach((t,i)=>{t.color=i==sel?0xFFFF00:WHITE})};
+ const setVal=(n,dir)=>{const o=HOPT[n];if(!o)return;hMenuSfx();let v=hcv(o[0]);
+  if(dir==null)v=v?0:1;else{const lo=o[2],hi=o[3]+9,span=hi-lo+1;v=v+dir*o[4];v=((v-lo)%span+span)%span+lo}
+  cfg[o[0]]=v;saveCfg();showVal(sel,o)};
+ move(data&&data.page!=null?data.page:0,false);
+ st.update=dt=>{
+  if(page!=1){let d=(hjp('up')?-1:0)+(hjp('down')?1:0);for(const w of WHEEL)d+=w>0?1:-1;if(d)changeSel(d)}
+  for(const[cx,cy]of clicks){const p=hMouse(cam);texts.members.forEach((t,i)=>{if(p.y>=t.y&&p.y<=t.y+t.height){if(sel!=i){sel=i;changeSel(0)}pressed.push('Enter')}})}
+  if(hjp('accept')){if(page==0){move(sel+1);return}const n=texts.members[sel]&&texts.members[sel].text,o=HOPT[n];if(o&&o[1]=='bool')setVal(n)}
+  if((hjp('left')||hjp('right'))&&page>1){const n=texts.members[sel].text,o=HOPT[n];if(o&&o[1]=='number')setVal(n,(hjp('left')?-1:0)+(hjp('right')?1:0))}
+  if(hjp('back')){if(page>0)move(0);else{saveCfg();buildKM();const r=st.data&&st.data.ret;if(r=='play'&&st.data.song)hStartSong(st.data.song);else hGo('main')}}}};
+HSTATES.keys=async(st,data)=>{const cam=st.GAME;
+ const rows=['left','down','up','right'];let sel=0,p2=false,tm=0;
+ const title=new FT(0,100,0,'notes',24);title.color=0xFF0000;title.alignment='center';title.screenCenter('X');title.scale={x:4,y:2};madd(st,title);
+ const names=[],b1=[],b2=[];
+ rows.forEach((r,i)=>{const y=194+94*i;const a=new FT(100,y,0,r,26);const b=new FT(500,y,0,'',26),c=new FT(820,y,0,'',26);names.push(a);b1.push(b);b2.push(c);madd(st,a);madd(st,b);madd(st,c)});
+ const reset=new FT(100,194+94*4,0,'reset to default keys',26);madd(st,reset);
+ const kn=c=>!c?'---':kname(c).toLowerCase();
+ const refresh=()=>{rows.forEach((r,i)=>{b1[i].text=kn(cfg.bind[i]);b2[i].text=kn(cfg.alt[i])})};refresh();
+ // ChangeKeybindSubState: white overlay + "Rebinding <name>"
+ const ov=new FS().makeGraphic(1,1,0xFFFFFFFF);ov.scale={x:W,y:H};ov.updateHitbox();ov.x=0;ov.y=0;ov.alpha=0;ov.visible=false;madd(st,ov);
+ const rt=new FT(0,160,W,'',26);rt.alignment='center';rt.visible=false;madd(st,rt);const rt2=new FT(0,340,W,'Press ESC to Cancel',26);rt2.alignment='center';rt2.visible=false;madd(st,rt2);
+ const stopBind=()=>{st.rebinding=false;ov.visible=rt.visible=rt2.visible=false;cancelTweensOf(ov)};
+ st.update=dt=>{tm+=dt;
+  if(st.rebinding){for(const k of pressed){if(k=='Escape'){stopBind();hMenuSfx(2);break}const arr=p2?cfg.alt:cfg.bind;for(const a of[cfg.bind,cfg.alt])for(let j=0;j<4;j++)if(a[j]==k)a[j]='';arr[sel]=k;saveCfg();refresh();stopBind();hMenuSfx(1);break}pressed.length=0;return}
+  const n=rows.length+1;if(hjp('up')){sel=(sel-1+n)%n;hMenuSfx()}if(hjp('down')){sel=(sel+1)%n;hMenuSfx()}if(hjp('left')||hjp('right')){p2=!p2;hMenuSfx()}
+  for(const[cx,cy]of clicks){const p=hMouse(cam);[...names,reset].forEach((t,i)=>{if(p.y>=t.y&&p.y<=t.y+t.height){sel=i;if(i<4){p2=cx>660;pressed.push('Enter')}else pressed.push('Enter')}})}
+  if(hjp('accept')){if(sel==4){cfg.bind=PRE.WASD.slice();cfg.alt=ARR.slice();saveCfg();refresh();hMenuSfx(1)}else{st.rebinding=true;ov.visible=rt.visible=rt2.visible=true;ov.alpha=0;ftw(ov,{alpha:.6},.35);rt.text='Rebinding '+rows[sel];hMenuSfx(1)}}
+  if(hjp('back')){hGo('opt',Object.assign({},data&&data.back||{},{page:0}));return}
+  [...names,reset].forEach((t,i)=>{t.color=i==sel?0xFFFF00:WHITE});b1.forEach((b,i)=>{b.color=i==sel?0xFFFF00:WHITE;b.alpha=i==sel&&!p2?Math.abs(Math.sin(tm*4)):1});b2.forEach((b,i)=>{b.color=i==sel?0xFFFF00:WHITE;b.alpha=i==sel&&p2?Math.abs(Math.sin(tm*4)):1})}};
+
+/* ---------- MusicBeatTransition.hx: transition out to the next screen ---------- */
+HSTATES.trans=async st=>{const E=await hElevator(st);const cam=st.GAME;
+ const texts=await hTxt('data/texts/loadingTexts.txt');CTX=st;E.songName.text=rndObj(texts);E.monitor.play('staticlooped');
+ E.door.play('opened');cam.zoom=4;ftw(cam,{zoom:1.6},.6,{onComplete:()=>E.door.play('close')});
+ E.door.finCb=n=>{if(n=='close'){const [nx,dd]=st.next||['play'];hGo(nx,dd)}}};
+
+/* ---------- songs ---------- */
+function hStartSong(id){const st=HA.st;HA.load=st;HA.lastSong=id;hMusicStop();if(st&&st.destroy)try{st.destroy()}catch(e){}HA.st=null;CTX=null;startSong(id)}
+// end of a Hello Again song (PlayState -> FreeplayState through the elevator transition)
+function hajdSongEnd(G,fin){const id=G.id.replace(/^hajd:/,'');HA.lastSong=G.id;
+ if(fin){const s=hsave().scores,o=s[id]||{score:0,misses:0,acc:-1},acc=G.accN?G.accS/(G.accN+G.miss):-1;if(G.score>o.score||o.score==0)s[id]={score:Math.max(1,G.score),misses:G.miss,acc};hsaveW()}
+ let data=null;if(fin&&id=='cheeba'&&cfg.cm)data={music:"sus/Enormous Penis - Da Vinci's Notebook"};
+ CTX=null;hTransOut('play',data).catch(e=>{err=e.message;S='err'})}
+
+/* ---------- HJDPauseMenu.hx ---------- */
+async function hPauseInit(G){if(G.hp_)return;const st=hNewState('pause');G.hp_=st;const cam=st.GAME;cam.zoom=1.1;CTX=st;
+ const [pAt,cr]=await Promise.all([hA('menu/rolbox/pause/im_pausing'),hTxt('songs/'+G.cn.folder+'/credits.txt')]);
+ st.black=new FS().makeGraphic(1,1,0xFF000000);st.black.scale={x:W,y:H};st.black.origin={x:0,y:0};madd(st,st.black);
+ const ts=st.ts=new FS().frames(pAt);['resume','restart','setting','leave'].forEach((o,i)=>ts.addPrefix(String(i),o,24));ts.play('0');ts.screenCenter('X');madd(st,ts);
+ const c=new FT(0,0,0,'',12);c.font='MArialI';c.scale={x:1.5,y:1.5};c.text=cr.join('\n');c.updateHitbox();c.x=W-c.width-50;c.y=40;madd(st,c);CTX=null}
+function hPauseOpen(G){const st=G.hp_;if(!st)return;CTX=st;st.ftw=[];st.ftm=[];st.sel=0;st.closing=false;st.black.alpha=0;ftw(st.black,{alpha:.5},.1);const ts=st.ts;ts.play('0',true);ts.y=-ts.height;ftw(ts,{y:(H-ts.height)/2},.1);CTX=null}
+function hPause(G,dt){const st=G.hp_;if(!st){pauseMenu(dt);return}CTX=st;ftimerTick(st,dt);ftick(st,dt);for(const o of st.M)if(o&&o.update)o.update(dt);
+ const opts=['resume','restart','setting','leave'],ts=st.ts;
+ const act=i=>{const o=opts[i];if(o=='resume'){if(st.closing)return;st.closing=true;ftw(ts,{y:H},.1,{onComplete:()=>{CTX=null;pauseResume(G)}})}
+  else if(o=='restart'){CTX=null;G.paused=0;G.inst.pause();G.voc.pause();stopSfx();startSong(G.id)}
+  else if(o=='setting'){CTX=null;G.paused=0;G.inst.pause();G.voc.pause();stopSfx();(G.vids||[]).forEach(v=>v.pause());hGo('opt',{ret:'play',song:G.id})}
+  else{CTX=null;G.paused=0;endSong()}};
+ if(!st.closing){
+  if(hjp('up')||hjp('down')){st.sel=(st.sel+(hjp('up')?-1:1)+4)%4;ts.play(String(st.sel));hSnd('menu/scroll')}
+  if(hjp('accept')){act(st.sel);if(S!='play'||!G.paused){CTX=null;return}}
+  else if(hjp('back')){CTX=null;pauseResume(G);return}
+  for(const[cx,cy]of clicks){const p=hMouse(st.GAME),i=Math.floor((p.y-ts.y)/ts.height*4);if(p.x>ts.x&&p.x<ts.x+ts.width&&i>=0&&i<4){st.sel=i;ts.play(String(i));act(i);if(S!='play'||!G.paused){CTX=null;return}}}}
+ X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;X.drawImage(G.snap,0,0);for(const c of st.camList)drawCam(st,c,dt);CTX=null}
+
+/* ---------- HJDGameOver.hx ---------- */
+async function hDeathInit(G){if(G.hd_)return;const [ta,aa,ab]=await Promise.all([hTxt('data/texts/deadTexts.txt'),hA('menu/rolbox/sm/AGAIN'),hA('menu/rolbox/sm/agian')]);G.hd_={texts:ta,AGAIN:aa,agian:ab}}
+function hDie(G){const R=G.hd_;if(!R)return false;const st=hNewState('over');G.hdS=st;CTX=st;const cam=st.GAME,time=1.267,sv=hsave();
+ const snap=document.createElement('canvas');snap.width=cv.width;snap.height=cv.height;snap.getContext('2d').drawImage(cv,0,0);st.snap=snap;st.snapA=1;fnum2(1,0,time-1,{ease:EZ('quad','Out')},n=>{st.snapA=n});
+ const T_=(t,sz,col)=>{const o=new FT(0,0,0,t,sz);o.color=col;return o};
+ const ok=T_('GAME OVER',80,0xFF0000);ok.screenCenter();ok.y+=-10;ok.alpha=0;madd(st,ok);
+ const aw=T_(rndObj(R.texts).split('\\n').join('\n'),30,WHITE);aw.screenCenter();aw.y+=30;aw.alpha=0;madd(st,aw);
+ const again=T_('again',40,WHITE);again.screenCenter();again.y+=180;again.x-=100;again.alpha=0;madd(st,again);
+ const dieF=T_('die forever',40,WHITE);dieF.screenCenter();dieF.y+=180;dieF.x+=120;dieF.alpha=0;madd(st,dieF);
+ let canSelect=false,intro=false,cur=0,mus=null;
+ ftimer(time,()=>{mus=st.mus=snd(CNE.root+'music/gameOver.ogg',1,1);mus.play().catch(()=>{})});
+ const againNew=new FS(250,512).frames(rndB(10)?R.agian:R.AGAIN).addPrefix('fire','fire',24).play('fire');againNew.scale={x:.8,y:.8};againNew.angle=-12;againNew.alpha=0;madd(st,againNew);
+ ftw(ok,{alpha:1},time,{ease:EZ('sine','Out'),startDelay:2,onComplete:()=>{ftw(ok,{y:120},time,{ease:EZ('quad','Out')});ftw(aw,{y:200},time,{ease:EZ('quad','Out')});
+  ftw(aw,{alpha:1},time+.2,{ease:EZ('quad','Out'),onComplete:()=>{ftimer(time-.2,()=>{for(const o of[sv.gameOverAgain?againNew:again,dieF])ftw(o,{alpha:1},time,{ease:EZ('quad','Out'),onComplete:()=>{canSelect=true;intro=true}})})}})}});
+ const change=n=>{cur=((cur+n)%2+2)%2;if(cur==0){again.color=0xFFFF00;againNew.scale={x:.9,y:.9};againNew.color=WHITE;dieF.color=WHITE}else{again.color=WHITE;againNew.scale={x:.8,y:.8};againNew.color=0x7777AA;dieF.color=0xFFFF00}};
+ change(0);if(sv.gameOverAgain)again.visible=false;
+ const pitchDown=()=>{if(!mus)return;try{mus.preservesPitch=mus.mozPreservesPitch=mus.webkitPreservesPitch=false}catch(e){}fnum2(1,0,1.8,{ease:EZ('quad','Out')},r=>{if(r<.07)mus.pause();else mus.playbackRate=r})};
+ const restart=()=>{if(mus)mus.pause();CTX=null;startSong(G.id)};
+ st.update=dt=>{if(pressed.includes('Digit5')||pressed.includes('Numpad5')){sv.gameOverAgain=false;hsaveW()}
+  if(canSelect){if(hjp('right'))change(1);if(hjp('left'))change(-1);
+   for(const[cx]of clicks){const c=cx<W/2?0:1;if(c!=cur)change(c-cur);pressed.push('Enter')}
+   if(hjp('accept')){if(cur==0&&!sv.gameOverAgain){canSelect=false;sv.gameOverAgain=true;hsaveW();pitchDown();againNew.x+=400;againNew.y+=200;againNew.angle+=720;againNew.scale={x:3,y:3};
+     ftw(againNew,{alpha:1,x:250,y:512,'scale.x':.9,'scale.y':.9,angle:-12},.5,{onComplete:()=>{again.visible=false;hSnd('glassBreak');ftimer(.5,()=>{hSnd('stopit');for(const o of[ok,aw,againNew,dieF])ftimer(1,()=>ftw(o,{alpha:0},time-.8,{ease:EZ('quad','Out')}));ftimer(2,restart)});cam.shake(.05,.5)}})}
+    else{pitchDown();for(const o of[ok,aw,againNew,dieF])ftimer(.4,()=>ftw(o,{alpha:0},time-.8,{ease:EZ('quad','Out')}));canSelect=false;
+     if(cur==0){hSnd('confirm',.2);ftimer(2,restart)}else{hSnd('quit',.5);ftimer(2,()=>{if(mus)mus.pause();CTX=null;G.dead=0;endSong()})}}}}
+  else if(!intro&&(hjp('accept')||hClick()))hCompleteAll(st)};
+ CTX=null;return true}
+function hDeath(G,dt){const st=G.hdS;CTX=st;st.mdx=0;ftimerTick(st,dt);ftick(st,dt);if(st.update)st.update(dt);if(S!='play'||G.hdS!==st){CTX=null;return}for(const o of st.M)if(o&&o.update)o.update(dt);
+ X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;X.fillStyle='#000';X.fillRect(0,0,W,H);X.globalAlpha=Math.max(0,st.snapA);X.drawImage(st.snap,0,0);X.globalAlpha=1;
+ for(const c of st.camList)drawCam(st,c,dt);CTX=null}
+
+const clicks=[],tap=[],tl={};const MSD={down:0},WHEEL=[];
 const mpos=e=>{if(e.pointerType!='mouse')return;const r=cv.getBoundingClientRect();MS.on=1;MS.x=(e.clientX-r.left)*cv.width/r.width;MS.y=(e.clientY-r.top)*cv.height/r.height};
 cv.addEventListener('pointermove',mpos);cv.addEventListener('pointerdown',mpos);cv.addEventListener('pointerleave',()=>{MS.on=0});
 addEventListener('blur',()=>{if(cfg.ap&&S=='play'&&g&&g.go&&!g.paused&&!g.dead&&!g.vid)pauseGame()});
 let fcDrag=null;cv.addEventListener('pointerdown',e=>{if(S=='play'&&g&&g.fc){fcDrag=[e.clientX,e.clientY];try{cv.setPointerCapture(e.pointerId)}catch(_){}}});
 cv.addEventListener('pointermove',e=>{if(fcDrag&&g&&g.fc){const sc=cv.width/cv.clientWidth;g.fx-=(e.clientX-fcDrag[0])*sc/g.fz;g.fy-=(e.clientY-fcDrag[1])*sc/g.fz;fcDrag=[e.clientX,e.clientY]}});
 cv.addEventListener('pointerup',()=>{fcDrag=null});
+cv.addEventListener('pointerdown',()=>{MSD.down=1});addEventListener('pointerup',()=>{MSD.down=0});addEventListener('pointercancel',()=>{MSD.down=0});cv.addEventListener('wheel',e=>{if(S=='hajd'){e.preventDefault();WHEEL.push(e.deltaY)}},{passive:false});
 cv.addEventListener('wheel',e=>{if(S=='play'&&g&&g.fc){e.preventDefault();g.fz=Math.min(4,Math.max(.15,g.fz*Math.exp(-e.deltaY*.001)))}},{passive:false});
 cv.addEventListener('pointerdown',e=>{if(S=='start')boot();else if(S=='err')errBack();const r=cv.getBoundingClientRect(),p=[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];clicks.push(p);
  if(touchOn()&&p[0]<110&&p[1]<40&&S=='elev')pressed.push('Escape');
@@ -1239,13 +1660,15 @@ addEventListener('unhandledrejection',e=>{err=(e.reason&&e.reason.message)||Stri
 let last=performance.now();
 (function loop(now){
  let dt=Math.min(.05,(now-last)/1000);
- if(S=='play'&&g&&g.cne&&(cfg.soul||g.fpsCap)){SOUL.acc+=(now-last)/1000;last=now;if(SOUL.acc<1/(g.fpsCap||30)-.002){requestAnimationFrame(loop);return}dt=Math.min(.1,SOUL.acc);SOUL.acc=0}else last=now;
- try{if(S=='menu')menu(dt);else if(S=='elev')elev(dt);else if(S=='set')sett(dt);else if(S=='mods')mods(dt);else if(S=='cred')cred(dt);else if(S=='play')play(dt);else{
+ if(S=='play'&&g&&(g.cne?(cfg.soul||g.fpsCap||cfg.fr<120):cfg.lag&&!g.paused&&!g.vid)){SOUL.acc+=(now-last)/1000;last=now;if(SOUL.acc<1/(g.fpsCap||(g.cne&&!cfg.soul?cfg.fr:30))-.002){requestAnimationFrame(loop);return}dt=Math.min(.1,SOUL.acc);SOUL.acc=0}else last=now;
+ try{if(S=='menu')menu(dt);else if(S=='elev')elev(dt);else if(S=='set')sett(dt);else if(S=='mods')mods(dt);else if(S=='cred')cred(dt);else if(S=='play'){CTX=null;play(dt)}else if(S=='hajd')hajdLoop(dt);else if(S=='load'&&HA.load&&hLoadDraw()){}else{
   X.fillStyle='#000';X.fillRect(0,0,W,H);X.fillStyle='#fff';X.textAlign='center';X.font='32px MArial, Arial';
   X.fillText(S=='start'?'Click or press Enter to start':S=='err'?'Error: '+err:(LP.msg||'Loading...'),W/2,H/2);if(S=='err'){X.font='20px MArial, Arial';X.fillText('press enter or click to go back',W/2,H/2+44)}if(S=='load'&&LP.t){const bw=360,pr=Math.min(1,LP.n/LP.t);X.strokeStyle='#fff';X.lineWidth=2;X.strokeRect(W/2-bw/2,H/2+30,bw,18);X.fillRect(W/2-bw/2+3,H/2+33,(bw-6)*pr,12)}}}
  catch(e){err=e.message;S='err';console.error(e)}
- {const sh=MS.on&&CUR.width&&(S=='menu'||S=='elev'||S=='set'||S=='cred'||S=='mods'||(S=='play'&&g&&(g.paused||g.dead||g.fc||(g.ily&&g.hold&&g.ily.ph==1))));if(sh){X.globalAlpha=1;X.drawImage(CUR,MS.x-5,MS.y-5)}if(sh!==MS.show){MS.show=sh;cv.style.cursor=sh?'none':''}}
- pressed.length=0;clicks.length=0;tap.length=0;requestAnimationFrame(loop)})(last);
+ if(S=='play'&&g&&!g.cne&&cfg.pxs&&!g.paused&&!g.vid)hjdPost();
+ {const sh=MS.on&&CUR.width&&(S=='menu'||S=='elev'||S=='set'||S=='cred'||S=='mods'||S=='hajd'||(S=='play'&&g&&(g.paused||g.dead||g.fc||(g.ily&&g.hold&&g.ily.ph==1))));if(sh){X.globalAlpha=1;X.drawImage(CUR,MS.x-5,MS.y-5)}if(sh!==MS.show){MS.show=sh;cv.style.cursor=sh?'none':''}}
+ try{volKeys(dt)}catch(e){}if(S=='play')HA.load=null;
+ pressed.length=0;clicks.length=0;tap.length=0;WHEEL.length=0;requestAnimationFrame(loop)})(last);
 
 /* ---------- CODE WALL (matrix bg from the stage script) ---------- */
 function mkCode(){const cols=[];for(let i=0;i<106;i++){const c=document.createElement('canvas');c.width=18;c.height=96;const x=c.getContext('2d');x.fillStyle='#0f0';x.font='24px vcr, monospace';x.textAlign='center';for(let j=0;j<4;j++)x.fillText(Math.random()<.5?'0':'1',9,22+j*24);cols.push(c)}return cols}
@@ -1300,9 +1723,10 @@ function elev(dt){
  X.restore();if(touchOn()){X.fillStyle='#fff';X.font='20px MArial, Arial';X.textAlign='left';X.fillText('‹ back',12,28)}if(e.dp!=null&&e.dp>.8){X.fillStyle='rgba(0,0,0,'+Math.min(1,(e.dp-.8)/.35)+')';X.fillRect(0,0,W,H)}}
 
 /* ---------- PAUSE ---------- */
-function pauseGame(){const G=g;if(G.paused||G.dead)return;G.paused=1;G.psel=0;G.pt=0;G.inst.pause();G.voc.pause();(G.sfx||[]).forEach(a=>a.pause());
+function pauseGame(){const G=g;if(G.paused||G.dead||G.noPause)return;G.paused=1;G.psel=0;G.pt=0;G.inst.pause();G.voc.pause();(G.sfx||[]).forEach(a=>a.pause());
  G.vwas=G.vids.filter(v=>!v.paused&&!v.ended&&v.currentTime>0);G.vwas.forEach(v=>v.pause());
- const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;c.getContext('2d').drawImage(cv,0,0);G.snap=c}
+ const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;c.getContext('2d').drawImage(cv,0,0);G.snap=c;if(G.cne)hPauseOpen(G)}
+function pauseResume(G){G.paused=0;(G.sfx||[]).forEach(a=>{if(!a.ended&&a.currentTime>0&&a.volume>0)a.play().catch(()=>{})});if(G.go){G.rs=1;G.rsT=0;try{G.inst.currentTime=Math.max(0,G.pos/1000);G.voc.currentTime=Math.max(0,G.pos/1000)}catch(e){}G.rsC=G.inst.currentTime;G.inst.play().catch(()=>{});G.voc.play().catch(()=>{})}else G.vwas.forEach(v=>v.play().catch(()=>{}))}
 function pauseMenu(dt){const G=g;G.pt+=dt;
  const fr=G.pa.get(['resume','restart','setting','leave'][G.psel]),f=fr[Math.floor(G.pt*24)%fr.length],y=-f.fh+((H-f.fh)/2+f.fh)*Math.min(1,G.pt/.1);
  const act=i=>{if(i==0){G.paused=0;(G.sfx||[]).forEach(a=>{if(!a.ended&&a.currentTime>0&&a.volume>0)a.play().catch(()=>{})});if(G.go){G.rs=1;G.rsT=0;try{G.inst.currentTime=Math.max(0,G.pos/1000);G.voc.currentTime=Math.max(0,G.pos/1000)}catch(e){}G.rsC=G.inst.currentTime;G.inst.play().catch(()=>{});G.voc.play().catch(()=>{})}else G.vwas.forEach(v=>v.play().catch(()=>{}))}
@@ -1318,7 +1742,7 @@ function pauseMenu(dt){const G=g;G.pt+=dt;
 const DTX=['you F###ing Suck','well you died','good job\nyou died','youre what we used to call. a noob ok.','guest wouldnt be proud of you','k.','well hey','uhhhh hello?'];
 function die(){const G=g;G.dead=1;G.inst.pause();G.voc.pause();G.vids.forEach(v=>v.pause());
  const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;c.getContext('2d').drawImage(cv,0,0);G.snap=c;
- G.dtm=0;G.dtx=pick_(DTX);G.dsel=0;G.dend=0;G.dmus=0}
+ G.dtm=0;G.dtx=pick_(DTX);G.dsel=0;G.dend=0;G.dmus=0;if(G.cne)hDie(G)}
 function death(dt){const G=g,cl=(v,m=1)=>Math.min(m,Math.max(0,v)),qo=t=>1-(1-t)*(1-t),T=1.267;G.dtm+=dt;
  if(!G.dmus&&G.dtm>T){G.dmus=snd('music/gameOver.ogg',1);G.dmus.play().catch(()=>{})}
  for(const k of pressed){if(G.dend)break;
