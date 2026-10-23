@@ -1,0 +1,23 @@
+<!DOCTYPE codename-engine-alphabet-font>
+<alphabetFont fps="24" advance="40" lineGap="40" colorMode="none">
+	<spritesheet>menus/alphabet-bold</spritesheet>
+
+	<defaultAnim>UPPERLETTER bold</defaultAnim>
+	<anim char=":" y="-8">colon bold</anim>
+	<anim char="s" y="-2">S bold</anim>
+	<anim char="u" y="1">U bold</anim>
+	<anim char="a" x="-4" y="3">A bold</anim>
+	<anim char="n" y="-2">N bold</anim>
+	<anim char="l" y="2">L bold</anim>
+	<anim char="x" x="-3" y="1">X bold</anim>
+	<anim char="g" x="-2" y="1">G bold</anim>
+	<anim char="1" y="3">1 bold</anim>
+	<anim char="2" y="1">2 bold</anim>
+	<anim char="4" y="1">4 bold</anim>
+	<anim char="5" y="-1">5 bold</anim>
+	<anim char="6" y="-1">6 bold</anim>
+	<anim char="7" y="4">7 bold</anim>
+	<anim char="8" y="1">8 bold</anim>
+	<anim char="9" x="2" y="2">9 bold</anim>
+	<anim char=">">>bold</anim>
+</alphabetFont>
